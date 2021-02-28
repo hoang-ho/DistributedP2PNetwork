@@ -1,0 +1,35 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.p2p.grpc;
+
+service MarketPlace {
+  rpc lookup(BuyRequest) returns (Ack);
+  rpc reply(SellerId) returns (Ack);
+  rpc buy(PeerId) returns (Ack);
+}
+
+message Ack {
+  string message = 1;
+}
+
+message BuyRequest {
+  string productName = 1;
+  int32 hopCount = 2;
+  repeated PeerId peer = 3;
+}
+
+message SellerId {
+  string IPAddress = 1;
+  int32 port = 2;
+  repeated PeerId peer = 3;
+}
+
+
+message PeerId {
+  string IPAddress = 1;
+  int32 port = 2;
+}
+
+
+
+
