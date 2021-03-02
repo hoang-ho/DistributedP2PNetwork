@@ -13,7 +13,6 @@ public class PeerReference {
         this.id = id;
         this.IPAddress = IPAddress;
         this.port = port;
-
     }
 
     public int getPort(){
