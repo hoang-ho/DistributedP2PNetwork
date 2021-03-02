@@ -245,19 +245,19 @@ $ ./gradlew clean build
 
 For **test case 1**, in one terminal run:
 ```
-\\ to create a seller with id 0, at port 8080, sell fish, with stock 3, having a neighbor with id 1 at port 8081
+// to create a seller with id 0, at port 8080, sell fish, with stock 3, having a neighbor with id 1 at port 8081
 $ gradle p2pSeller --args="0 8080 fish 3 1 8081"
 ```
 
 In another terminal run: 
 ```
-\\ to create a buyer with id 1, at port 8081, having a neighbor with id 0 at port 8080
+// to create a buyer with id 1, at port 8081, having a neighbor with id 0 at port 8080
 $ gradle p2pBuyer --args="1 8081 fish 0 8080"
 ```
 
 The log for test case 1, should look like this
 ```
-\\ Seller process
+// Seller process
 > Task :p2pSeller
 Mar 01, 2021 7:01:37 PM com.p2p.grpc.Peer startServer
 INFO: Starting a server at localhost 8080
@@ -306,7 +306,7 @@ INFO: Finish a transaction. Current have 1
 ```
 
 ``` 
-\\ Buyer side
+// Buyer side
 > Task :p2pBuyer
 Mar 01, 2021 7:03:01 PM com.p2p.grpc.Peer startServer
 INFO: Starting a server at localhost 8081
@@ -377,7 +377,7 @@ $ gradle p2pBuyer --args="1 8081 fish 0 8080"
 Your log should look like:
 
 ```
-\\ Seller side
+// Seller side
 Mar 01, 2021 7:10:58 PM com.p2p.grpc.Peer startServer
 INFO: Starting a server at localhost 8080
 Mar 01, 2021 7:11:09 PM com.p2p.grpc.Peer$MarketPlaceImpl lookup
@@ -408,7 +408,7 @@ INFO: Receive lookup request at 8080
 ```
 
 ```
-\\ Buyer side
+// Buyer side
 > Task :p2pBuyer
 Mar 01, 2021 7:11:08 PM com.p2p.grpc.Peer startServer
 INFO: Starting a server at localhost 8081
