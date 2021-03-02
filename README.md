@@ -238,6 +238,10 @@ public class Peer {
 
 For milestone 1, we don't need to traverse back the path, so the reply(SellerId) arrives at the Buyer, and the Buyer now creates a client to perform a buy RPC. For the buyHelper, we in fact just need to decrement the amount in the stock and restock if needed, so no further RPC is needed. Once the buyHelper() finish, the Seller return an acknowledgement message to the Buyer.
 
+## Build
+
+The project is build with Java 1.8, Gradle 6.7, and gRPC 1.36.0
+
 To run:
 ``` 
 $ ./gradlew clean build
