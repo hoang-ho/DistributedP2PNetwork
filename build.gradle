@@ -66,6 +66,16 @@ protobuf {
     }
 }
 
+task p2pSeller(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = "com.p2p.grpc.Seller"
+}
+
+task p2pBuyer(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = "com.p2p.grpc.Buyer"
+}
+
 test {
     useJUnitPlatform()
 }

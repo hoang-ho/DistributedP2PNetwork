@@ -8,70 +8,62 @@ import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class Peer {
-    private int id;
-    private String IPAddress;
-    private int port;
-    private String product;
+    private final String product;
     private int amountSell;
     private int amountBuy;
-    private int stock;
-    private Peer neighbors;
+    private PeerReference neighbor;
+    private final String IPAddress;
+    private final int port;
+    private int id;
+    private final int stock;
+    private final Server server;
+
     private static final Logger logger = Logger.getLogger(Peer.class.getName());
 
-    public Peer(int id, String IPAddress, int port) {
+    public Peer(int id, String IPAddress, int port, String product, int amountBuy, int amountSell) {
         this.id = id;
         this.IPAddress = IPAddress;
         this.port = port;
+        this.product = product;
+        this.amountBuy = amountBuy;
+        this.amountSell = amountSell;
+        this.stock = amountSell;
+        this.server =
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(10)).build();
     }
 
-    /**
-     * Run the server!
-     */
-    public void run(int amountSell, int amountBuy, String product) {
-        this.stock = amountSell;
-        this.amountSell = this.stock;
-        this.amountBuy = amountBuy;
-        this.product = product;
-        Server server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(10)).build();
-
+    public void startServer() {
         try {
             server.start();
-            logger.info("starting a server at " + IPAddress + " " + port);
-            // start buying if we are buyer
-            if (this.stock < 0) {
-                // perform lookup
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbors.getIPAddress(),
-                                neighbors.getPort()).usePlaintext().build();
-                        try {
-                            MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel);
-                            PeerId peerId = PeerId.newBuilder().setIPAddress(IPAddress).setPort(port).build();
-                            BuyRequest request =
-                                    BuyRequest.newBuilder().setProductName(product).setHopCount(1).addPeer(peerId).build();
-                            logger.info(port + " send a buy request to " + neighbors.IPAddress + " " + neighbors.port);
-                            stub.lookup(request);
-                        } finally {
-                            channel.shutdown();
-                        }
-                    }
-                });
-                t.start();
-            }
-            server.awaitTermination();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.info("Starting a server at " + IPAddress + " " + port);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    public void blockUntilShutdown() {
+        try {
+            server.awaitTermination();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * Server side code for each RPC call
+     * Both Buyer and Seller have the server.
+     * Buyer will be the server for lookup and reply.
+     * Seller will be the server for lookup and buy.
+     * All RPC calls return an acknowledge message immediately, except for the buy RPC which blocks until the buy
+     * completes
+     * */
     private class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
         @Override
         public void lookup(BuyRequest request, StreamObserver<Ack> streamObserver) {
@@ -95,9 +87,11 @@ public class Peer {
             buyHelper();
             streamObserver.onNext(Ack.newBuilder().setMessage("Ack").build());
             streamObserver.onCompleted();
+            logger.info("Finish a transaction. Current have " + amountSell);
         }
     }
 
+    // this code helps
     private void lookupHelper(BuyRequest request) {
         // if peer is a seller and is selling the product, reply to the caller
         if (amountSell > 0 && request.getProductName().equals(product)) {
@@ -112,7 +106,7 @@ public class Peer {
 
             ManagedChannel channel = ManagedChannelBuilder.forAddress(IPAddress, lastPort).usePlaintext().build();
             try {
-                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel);
+                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
                 logger.info("Send reply request at " + port);
                 Ack acknowledge = stub.reply(message);
             } finally {
@@ -120,6 +114,7 @@ public class Peer {
             }
         }
         // else pass the message to its neighbor, i.e., flooding
+        // Nothing for milestone 1
     }
 
     private void replyHelper(SellerId message) {
@@ -131,12 +126,12 @@ public class Peer {
             PeerId peer = PeerId.newBuilder().setIPAddress(IPAddress).setPort(port).build();
             ManagedChannel channel = ManagedChannelBuilder.forAddress(sellerIPAddress, sellerPort).usePlaintext().build();
             try {
-                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel);
+                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
                 logger.info("Send buy request at " + port);
                 Ack acknowledge = stub.buy(peer);
                 // increment your amount buy this need to be synchronized
                 this.amountBuy += 1;
-                logger.info("Buying " + product + " succeeds.");
+                logger.info("Buying " + product + " succeeds. Current have " + this.amountBuy + " " + product);
             } finally {
                 channel.shutdown();
             }
@@ -145,13 +140,17 @@ public class Peer {
     }
 
     // this method will need to be synchronized!
+    // decrement the amountSell and restock :)
     private void buyHelper() {
         amountSell -= 1;
-
+        if (amountSell == 0) {
+            logger.info(product + " runs out!!!! Restocking");
+            amountSell = stock;
+        }
     }
 
-    public void setNeighbor(Peer neighbor) {
-        neighbors = neighbor;
+    public void setNeighbor(PeerReference peer) {
+        this.neighbor = peer;
     }
 
     public String getIPAddress() {
@@ -160,5 +159,17 @@ public class Peer {
 
     public int getPort() {
         return port;
+    }
+
+    public String getNeighborAddress() {
+        return neighbor.getIPAddress();
+    }
+
+    public int getNeighborPort() {
+        return neighbor.getPort();
+    }
+
+    public String getProduct() {
+        return product;
     }
 }
