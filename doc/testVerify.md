@@ -6,9 +6,9 @@ When I run test case 1 (a buyer of fish and a seller of fish), based on the log,
 
 When I run test case 2 (a buyer of fish and a seller of boar), based on the log, I can see that no product is sold and the Buyer keeps sending out lookup request and Seller keeps receiving it, but since hopcount is hardcoded to 1 in Milestone 1, the lookup request isn't propagated.
 
-To follow the instruction below or run the **test.sh** script.
+BE AWARE: In **test.sh**, we run two processes in parallel and terminate them (or else they will run forever), so it will throw errors such as: "FAILURE: Build failed with an exception." or "SEVERE: Exception while executing runnable io.grpc.internal.ServerImplHalfClosed". These errors are due to we stop the gradle tasks while the communication between the two processes are happening. JUST IGNORE IT!
 
-BE AWARE: In **test.sh**, we run two processes in parallel and terminate them, so it will throw errors such as: "FAILURE: Build failed with an exception." or "SEVERE: Exception while executing runnable io.grpc.internal.ServerImplHalfClosed". These errors are due to we stop the gradle tasks while the communication between the two processes are happening. JUST IGNORE IT!
+To run the test, follow the instruction below or run the **test.sh** script.
 
 For **test case 1**, in one terminal run:
 ```
