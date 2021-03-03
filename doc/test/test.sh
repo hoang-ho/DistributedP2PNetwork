@@ -1,4 +1,7 @@
 # to compile
+# get to the project main directory
+cd ../..
+
 echo "This script is to run the test!"
 
 echo "PLEASE IGNORE the \"FAILURE: Build failed with an exception.\" and the \"SEVERE: Exception while executing runnable io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$1HalfClosed\""
