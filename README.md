@@ -1,5 +1,32 @@
 # Lab 1
 
+## Project structure
+
+
+```
+project
+│   README.md
+│   test.sh    
+│
+└───doc
+│   │   doc.md // design description
+│   │   testVerify.md // test verification
+│   
+└───src
+│   └───main
+│   │   └───java
+│   │       └───com.p2p.grpc
+│   │           │   Buyer.java
+│   │           │   Peer.java
+│   │           │   PeerImpl.java
+│   │           │   PeerReference.java
+│   │           │   Seller.java
+│   │   └───proto
+│   │       │   Interfaces.proto
+```
+
+
+
 ## Build and Test
 
 ### Compiling
@@ -11,7 +38,7 @@ To run:
 $ ./gradlew clean build
 ```
 
-All hopcount is hardcoded to be 1 for milestone 1. Professor confirmed that it's okay to have the two peers: one buyer, one seller for milestone 1.
+**hopcount** is hardcoded to be 1 for milestone 1. Professor confirmed that it's okay to have the two peers: one buyer, one seller for milestone 1.
 
 ### Testing
 
