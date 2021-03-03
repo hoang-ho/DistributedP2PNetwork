@@ -37,22 +37,22 @@ public class PeerImpl {
      * */
     @Override
     public PeerId lookup(BuyRequest request) {
-      ManagedChannel channel = ManagedChannelBuilder.forAddress(this.getNeighborAddress(),
-              this.getNeighborPort()).usePlaintext().build();
-      // Wait for the server to start!
-      MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-      logger.info(this.port + " Send a buy request to " + this.getNeighborAddress() + " " + this.getNeighborPort());
-      return stub.lookupRPC(request);
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(this.getNeighborAddress(),
+                this.getNeighborPort()).usePlaintext().build();
+        // Wait for the server to start!
+        MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+        logger.info("Send a lookup request to " + this.getNeighborAddress() + " " + this.getNeighborPort());
+        return stub.lookupRPC(request);
     }
-  
+
     /**
      * This doesn't do anything for now
      * */
     @Override
     public PeerId reply(PeerId peerId) {
-      return null;
+        return null;
     }
-  
+
     /**
      * Nothing going on here! Only buyer can buy
      * */
@@ -72,18 +72,20 @@ public class Buyer {
      * */
     @Override
     public void buy(PeerId peerId) {
-      ManagedChannel channel = ManagedChannelBuilder.forAddress(peerId.getIPAddress(),
-              peerId.getPort()).usePlaintext().build();
-      try {
-        // Wait for the server to start!
-        MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-        logger.info( "Send a buy request to peer " + peerId.getId());
-        Ack message = stub.buyRPC(peerId);
-        this.incrementBuy(message);
-        logger.info("Bought " + this.getProduct() + " from peer " + peerId.getId() + ". Buyer current has " + this.getAmountBuy() + " " + this.getProduct());
-      } finally {
-        channel.shutdown();
-      }
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(peerId.getIPAddress(),
+                peerId.getPort()).usePlaintext().build();
+        try {
+            // Wait for the server to start!
+            MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+            logger.info( "Send a buy request to peer " + peerId.getId());
+            Ack message = stub.buyRPC(peerId);
+            if (message.getMessage().equals("Ack Sell")) {
+                amount += 1;
+            }
+            logger.info("Bought " + this.product.name() + " from peer " + peerId.getId() + ". Buyer current has " + this.amount + " " + this.product.name());
+        } finally {
+            channel.shutdown();
+        }
     }
     ...
 }
@@ -113,46 +115,69 @@ message PeerId {
 }
 ```
 
-The implementation of these RPC calls are as follows:
+The lookup function send lookupRPC to its neighbor. The lookupRPC will again call the lookupHelper function to help it decide whether to propagate the lookup request or to reply back! For a general peer, its lookupRPC will just propagate, while for a Seller peer, it will either propagate or reply. 
 
 ```java
 public class PeerImpl {
     ...
-    
+
     /**
      * Server side code for each RPC call
-     * Both Buyer and Seller have the server.
-     * Buyer will be the server for lookup and reply.
-     * Seller will be the server for lookup and buy.
-     * All RPC calls return an acknowledge message immediately, except for the buy RPC which blocks until the buy
-     * completes
+     * The Buyer and the general peer will use this server code
+     * The Seller will override this implementation
      * */
-    private final class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
-      @Override
-      public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
-        logger.info("Receive lookup request at " + port);
-        // propagate the lookup or return a reply
-        streamObserver.onNext(lookupHelper(request));
-        streamObserver.onCompleted();
-      }
-  
-      @Override
-      public void buyRPC(PeerId seller, StreamObserver<Ack> streamObserver) {
-        logger.info("Receive a buy request at " + port);
-        processBuy();
-        streamObserver.onNext(Ack.newBuilder().setMessage("Ack Sell").build());
-        streamObserver.onCompleted();
-        logger.info("Finish a transaction. Current have " + amountSell);
-      }
+    class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
+        @Override
+        public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
+            logger.info("Receive lookup request at " + port);
+            // propagate the lookup or return a reply
+            streamObserver.onNext(lookupHelper(request));
+            streamObserver.onCompleted();
+        }
     }
+
+    /**
+     * For a general peer, we just need it to flood the request to other peers!
+     * There is no general peer in milestone 1, so we ignore this for now!
+     * Nothing for now since we only have
+     * */
+    private PeerId lookupHelper(BuyRequest request) {
+        return null;
+    }
+}
+
+public class Seller {
     ...
+    /**
+     * Server side code for the Seller
+     * The Seller has somewhat different implementation because
+     * (1) only the Seller can sell - the buyRPC server code should only for the server
+     * (2) The lookupRPC in the Seller will decide whether to propagate or to reply!
+     * */
+    private class MarketplaceSellerImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
+        @Override
+        public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
+            logger.info("Receive lookup request at " + Seller.this.getPort());
+            // propagate the lookup or return a reply
+            streamObserver.onNext(lookupHelper(request));
+            streamObserver.onCompleted();
+        }
+
+        @Override
+        public void buyRPC(PeerId seller, StreamObserver<Ack> streamObserver) {
+            logger.info("Receive a buy request at " + Seller.this.getPort());
+            processBuy();
+            streamObserver.onNext(Ack.newBuilder().setMessage("Ack Sell").build());
+            streamObserver.onCompleted();
+            logger.info("Finish a transaction. Current have " + amount);
+        }
+    }
 
     private PeerId lookupHelper(BuyRequest request) {
         // if we are the buyer and we are selling the same product
-        if (request.getHopCount() > 0 && amountSell > 0 && request.getProductName().equals(product)) {
+        if (request.getHopCount() > 0 && request.getProduct().equals(product.name())) {
             // reply
-            PeerId seller = PeerId.newBuilder().setId(this.id).setIPAddress(this.IPAddress).setPort(this.port).build();
-            return seller;
+            return PeerId.newBuilder().setId(this.getId()).setIPAddress(this.getIPAddress()).setPort(this.getPort()).build();
         }
         // No flooding for now!
 //        else if (request.getHopCount() > 1) {
@@ -164,19 +189,19 @@ public class PeerImpl {
         // this is to signify not found!!!
         return PeerId.newBuilder().setId(-1).build();
     }
-    
-    private void processBuy() {
-      amountSell -= 1;
-      if (amountSell == 0) {
-        logger.info(product + " runs out!!!! Restocking");
-        amountSell = stock;
-      }
-    }
 
-    public void incrementBuy(Ack message) {
-      if (message.getMessage().equals("Ack Sell")) {
-        amountBuy += 1;
-      }
+    // this method will need to be synchronized!
+    // decrement the amountSell and restock :)
+    private void processBuy() {
+        // decrement the count
+        amount -= 1;
+        if (amount == 0) {
+            logger.info(product.name() + " runs out!!!! Restocking");
+            // randomize and restock!
+            product = Product.values()[RANDOM.nextInt(Product.values().length) - 1];
+            amount = stock;
+            logger.info("After randomize a new product and restock, now selling " + product.name());
+        }
     }
 }
 ```
