@@ -6,26 +6,26 @@
 ```
 project
 │   README.md
-│   test.sh    
+│   build.gradle    
 │
 └───doc
 │   │   doc.md // design description
 │   │   testVerify.md // test verification
+│   └───test
+│       │   test.sh
 │   
 └───src
 │   └───main
-│   │   └───java
-│   │       └───com.p2p.grpc
-│   │           │   Buyer.java
-│   │           │   Peer.java
-│   │           │   PeerImpl.java
-│   │           │   PeerReference.java
-│   │           │   Seller.java
-│   │   └───proto
-│   │       │   Interfaces.proto
+│       └───java
+│           └───com.p2p.grpc
+│               │   Buyer.java
+│               │   Peer.java
+│               │   PeerImpl.java
+│               │   PeerReference.java
+│               │   Seller.java
+│       └───proto
+│           │   Interfaces.proto
 ```
-
-
 
 ## Build and Test
 
