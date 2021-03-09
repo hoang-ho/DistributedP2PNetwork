@@ -7,12 +7,16 @@ import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class PeerImpl implements Peer{
 
-    private PeerReference neighbor;
+    private List<PeerId> neighbors;
     private final String IPAddress;
     private final int port;
     private final int id;
@@ -20,27 +24,57 @@ public class PeerImpl implements Peer{
 
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
-    public PeerImpl(int id, String IPAddress, int port) {
+    public PeerImpl(int id, String IPAddress, int port, int KNeighbor) {
         this.id = id;
         this.IPAddress = IPAddress;
         this.port = port;
+        this.neighbors = new ArrayList<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(10)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
     }
 
     /**
      * Implementation lookup interface
      * This lookup will do a lookupRPC call to all its neighbors
-     * The return from the lookupRPC is a PeerId, which is a reference to the seller
+     *
+     * @return a list PeerId each of which is a reference to the seller
      * */
     @Override
-    public PeerId lookup(BuyRequest request) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(this.getNeighborAddress(),
-                this.getNeighborPort()).usePlaintext().build();
-        // Wait for the server to start!
-        MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-        logger.info("Send a lookup request to " + this.getNeighborAddress() + " " + this.getNeighborPort());
-        return stub.lookupRPC(request);
+    public List<PeerId> lookup(String product, int hopCount) {
+        BuyRequest request = BuyRequest.newBuilder().setProduct(product).setHopCount(hopCount).build();
+        Thread[] lookupThread = new Thread[neighbors.size()];
+        List<PeerId> sellerList = Collections.synchronizedList(new ArrayList<>());
+        int counter = 0;
+        for (PeerId neighbor: neighbors) {
+            lookupThread[counter] = new Thread(() -> {
+                ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbor.getIPAddress(),
+                        neighbor.getPort()).usePlaintext().build();
+                // Wait for the server to start!
+                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+                logger.info("Send a lookup request to " + neighbor.getIPAddress() + " " + neighbor.getPort());
+                Iterator<PeerId> sellers = stub.lookupRPC(request);
+                logger.info("Lookup request return");
+                for (int i = 0; sellers.hasNext(); i++) {
+                    PeerId seller = sellers.next();
+                    if (seller.getId() == -1) {
+                        continue;
+                    }
+                    sellerList.add(seller);
+                }
+            });
+            lookupThread[counter].start();
+            counter++;
+        }
+
+        for (int i = 0; i < counter; i++) {
+            try {
+                lookupThread[i].join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return sellerList;
     }
 
     /**
@@ -80,26 +114,27 @@ public class PeerImpl implements Peer{
      * The Seller will override this implementation
      * */
     class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
+        /**
+         * Seller and no-role peer floods the request to its neighbors
+         * */
         @Override
         public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
             logger.info("Receive lookup request at " + port);
             // propagate the lookup or return a reply
-            streamObserver.onNext(lookupHelper(request));
+            if (request.getHopCount() == 1) {
+                streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
+            } else {
+                logger.info("Flood Lookup request");
+                List<PeerId> sellerList = lookup(request.getProduct(), request.getHopCount() - 1);
+                sellerList.forEach(streamObserver::onNext);
+                logger.info("Sent back results for lookup request");
+            }
             streamObserver.onCompleted();
         }
     }
 
-    /**
-     * For a general peer, we just need it to flood the request to other peers!
-     * There is no general peer in milestone 1, so we ignore this for now!
-     * Nothing for now since we only have
-     * */
-    private PeerId lookupHelper(BuyRequest request) {
-        return null;
-    }
-
-    public void setNeighbor(PeerReference peer) {
-        this.neighbor = peer;
+    public void addNeighbor(PeerId peer) {
+        this.neighbors.add(peer);
     }
 
     public int getId() { return id; }
@@ -108,13 +143,18 @@ public class PeerImpl implements Peer{
         return port;
     }
 
-    public String getNeighborAddress() {
-        return neighbor.getIPAddress();
-    }
-
-    public int getNeighborPort() {
-        return neighbor.getPort();
-    }
-
     public String getIPAddress() { return IPAddress; }
+
+    public static void main(String[] args) {
+        // id,IP address, port and KNeigbors
+        PeerImpl peer = new PeerImpl(Integer.parseInt(args[0]),"localhost", Integer.parseInt(args[1]), 1);
+        PeerId neighbor1 =
+                PeerId.newBuilder().setId(Integer.parseInt(args[2])).setIPAddress("localhost").setPort(Integer.parseInt(args[3])).build();
+        PeerId neighbor2 =
+                PeerId.newBuilder().setId(Integer.parseInt(args[4])).setIPAddress("localhost").setPort(Integer.parseInt(args[5])).build();
+        peer.addNeighbor(neighbor1);
+        peer.addNeighbor(neighbor2);
+        peer.startServer();
+        peer.blockUntilShutdown();
+    }
 }

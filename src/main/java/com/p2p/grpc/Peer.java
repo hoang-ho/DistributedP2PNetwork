@@ -1,12 +1,15 @@
 package com.p2p.grpc;
 
+import java.util.List;
+
 public interface Peer {
     /**
      * Call a RPC lookup to lookup for seller peer
-     * @param request is a BuyRequest containing product name and hopcount
+     * @param product is a string value for the name of the product
+     * @param hopCount is an integer value for the hopCount
      * @return a PeerId object containing reference to the Seller
      * */
-    PeerId lookup(BuyRequest request);
+    List<PeerId> lookup(String product, int hopCount);
 
     /**
      * Right now, I haven't made use of this function yet!

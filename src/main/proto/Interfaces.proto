@@ -3,7 +3,7 @@ option java_multiple_files = true;
 package com.p2p.grpc;
 
 service MarketPlace {
-  rpc lookupRPC(BuyRequest) returns (PeerId);
+  rpc lookupRPC(BuyRequest) returns (stream PeerId);
   rpc buyRPC(PeerId) returns (Ack);
 }
 
