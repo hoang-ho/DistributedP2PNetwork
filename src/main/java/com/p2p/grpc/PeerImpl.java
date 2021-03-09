@@ -9,10 +9,13 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class PeerImpl implements Peer{
 
@@ -21,6 +24,7 @@ public class PeerImpl implements Peer{
     private final int port;
     private final int id;
     private final Server server;
+    private Set<Pair<Integer, String>> lookupSenderList;
 
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
@@ -29,6 +33,7 @@ public class PeerImpl implements Peer{
         this.IPAddress = IPAddress;
         this.port = port;
         this.neighbors = new ArrayList<>();
+        this.lookupSenderList = Collections.synchronizedSet(new HashSet<>());
         this.server =
                 ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
     }
@@ -41,11 +46,14 @@ public class PeerImpl implements Peer{
      * */
     @Override
     public List<PeerId> lookup(String product, int hopCount) {
-        BuyRequest request = BuyRequest.newBuilder().setProduct(product).setHopCount(hopCount).build();
+        BuyRequest request = BuyRequest.newBuilder().setId(this.id).setProduct(product).setHopCount(hopCount).build();
         Thread[] lookupThread = new Thread[neighbors.size()];
         List<PeerId> sellerList = Collections.synchronizedList(new ArrayList<>());
         int counter = 0;
-        for (PeerId neighbor: neighbors) {
+        // stop flooding back the to where we was before
+        List<PeerId> toFlood =
+                neighbors.stream().filter(e -> !lookupSenderList.contains(new Pair<>(e.getId(), product))).collect(Collectors.toList());
+        for (PeerId neighbor: toFlood) {
             lookupThread[counter] = new Thread(() -> {
                 ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbor.getIPAddress(),
                         neighbor.getPort()).usePlaintext().build();
@@ -61,6 +69,7 @@ public class PeerImpl implements Peer{
                     }
                     sellerList.add(seller);
                 }
+                channel.shutdown();
             });
             lookupThread[counter].start();
             counter++;
@@ -125,8 +134,11 @@ public class PeerImpl implements Peer{
                 streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
             } else {
                 logger.info("Flood Lookup request");
+                Pair<Integer, String> lookupSender = new Pair<>(request.getId(), request.getProduct());
+                lookupSenderList.add(lookupSender);
                 List<PeerId> sellerList = lookup(request.getProduct(), request.getHopCount() - 1);
                 sellerList.forEach(streamObserver::onNext);
+                lookupSenderList.remove(lookupSender);
                 logger.info("Sent back results for lookup request");
             }
             streamObserver.onCompleted();
