@@ -1,5 +1,6 @@
 package com.p2p.grpc;
 
+import com.p2p.utils.Pair;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -19,7 +20,8 @@ public class Seller extends PeerImpl {
     private int amount;
     private final int stock;
     private final Server server;
-    private static final Random RANDOM = new Random();
+    private static Random RANDOM = new Random(0);
+
 
     private static final Logger logger = Logger.getLogger(Seller.class.getName());
     public Seller(int id, String IPAddress, int port, int KNeighbors, Product product, int amount) {
@@ -39,30 +41,46 @@ public class Seller extends PeerImpl {
      * */
     private class MarketplaceSellerImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
         @Override
-        public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
-            logger.info("Receive lookup request at " + Seller.this.getPort());
+        public void lookupRPC(LookUpRequest request, StreamObserver<PeerId> streamObserver) {
+            logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getId() + " " +
+                    " for product " + request.getProduct());
             // propagate the lookup or return a reply
             // if the seller is selling the product
             if (request.getProduct().equals(product.name())) {
-                logger.info("Reply to lookup request");
+                logger.info("Reply to lookup request from peer " + request.getId() + " for product " + request.getProduct());
                 streamObserver.onNext(PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build());
             } else if (request.getHopCount() == 1) {
                 // if hopCount is 1 then cannot flood further
+                logger.info("Invalidate lookup request from peer " + request.getId() + " for product" +
+                        " " + request.getProduct());
                 streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
             } else {
-                List<PeerId> sellerList = lookup(request.getProduct(), request.getHopCount() - 1);
+                logger.info("Flood Lookup request from peer " + request.getId() + " for product " + request.getProduct());
+                Pair<Integer, String> lookupSender = new Pair<>(request.getId(), request.getProduct());
+                Seller.this.lookupSenderList.add(lookupSender);
+                List<PeerId> sellerList = Seller.this.lookup(request.getProduct(), request.getHopCount() - 1);
+                Seller.this.lookupSenderList.remove(lookupSender);
                 sellerList.forEach(streamObserver::onNext);
+                logger.info("Sent back results for lookup request from peer " + request.getId() + " for product " + request.getProduct());
             }
             streamObserver.onCompleted();
         }
 
         @Override
-        public synchronized void buyRPC(PeerId seller, StreamObserver<Ack> streamObserver) {
-            logger.info("Receive a buy request at " + Seller.this.getPort());
-            processBuy();
-            streamObserver.onNext(Ack.newBuilder().setMessage("Ack Sell").build());
-            streamObserver.onCompleted();
-            logger.info("Finish a transaction. Current have " + amount);
+        public synchronized void buyRPC(BuyRequest buyRequest, StreamObserver<Ack> streamObserver) {
+            logger.info("Receive a buy request at " + Seller.this.getPort() + " from peer " + buyRequest.getId() + " " +
+                    "for product " + buyRequest.getProduct());
+            if (Seller.this.product.name().equals(buyRequest.getProduct())) {
+                processBuy();
+                streamObserver.onNext(Ack.newBuilder().setMessage("Ack Sell").build());
+                streamObserver.onCompleted();
+                logger.info("Finish a transaction for peer " + buyRequest.getId() + ". Currently, having: " + amount);
+            } else {
+                streamObserver.onNext(Ack.newBuilder().setMessage("Out of Stock").build());
+                streamObserver.onCompleted();
+                logger.info("Product out of stock! Now selling " + Seller.this.product.name());
+            }
+
         }
     }
 
@@ -74,7 +92,8 @@ public class Seller extends PeerImpl {
         if (amount == 0) {
             logger.info(product.name() + " runs out!!!! Restocking");
             // randomize and restock!
-            product = Product.values()[RANDOM.nextInt(Product.values().length - 1)];
+            int val = RANDOM.nextInt(4);
+            product = Product.values()[val];
             amount = stock;
             logger.info("After randomize a new product and restock, now selling " + product.name());
         }

@@ -1,4 +1,4 @@
-package com.p2p.grpc;
+package com.p2p.utils;
 
 public class Pair<K, V> {
     private final K peerID;

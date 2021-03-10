@@ -1,5 +1,6 @@
 package com.p2p.grpc;
 
+import com.p2p.utils.Pair;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -24,7 +25,7 @@ public class PeerImpl implements Peer{
     private final int port;
     private final int id;
     private final Server server;
-    private Set<Pair<Integer, String>> lookupSenderList;
+    public Set<Pair<Integer, String>> lookupSenderList;
 
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
@@ -46,7 +47,7 @@ public class PeerImpl implements Peer{
      * */
     @Override
     public List<PeerId> lookup(String product, int hopCount) {
-        BuyRequest request = BuyRequest.newBuilder().setId(this.id).setProduct(product).setHopCount(hopCount).build();
+        LookUpRequest request = LookUpRequest.newBuilder().setId(this.id).setProduct(product).setHopCount(hopCount).build();
         Thread[] lookupThread = new Thread[neighbors.size()];
         List<PeerId> sellerList = Collections.synchronizedList(new ArrayList<>());
         int counter = 0;
@@ -59,7 +60,8 @@ public class PeerImpl implements Peer{
                         neighbor.getPort()).usePlaintext().build();
                 // Wait for the server to start!
                 MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-                logger.info("Send a lookup request to " + neighbor.getIPAddress() + " " + neighbor.getPort());
+                logger.info("Send a lookup request to peer " + neighbor.getId() + " at port " + neighbor.getIPAddress() + " " +
+                                + neighbor.getPort() + " for product " + product);
                 Iterator<PeerId> sellers = stub.lookupRPC(request);
                 logger.info("Lookup request return");
                 for (int i = 0; sellers.hasNext(); i++) {
@@ -127,19 +129,21 @@ public class PeerImpl implements Peer{
          * Seller and no-role peer floods the request to its neighbors
          * */
         @Override
-        public void lookupRPC(BuyRequest request, StreamObserver<PeerId> streamObserver) {
-            logger.info("Receive lookup request at " + port);
+        public void lookupRPC(LookUpRequest request, StreamObserver<PeerId> streamObserver) {
+            logger.info("Receive lookup request at " + port + " from peer " + request.getId() + " for product " + request.getProduct());
             // propagate the lookup or return a reply
             if (request.getHopCount() == 1) {
+                logger.info("Invalidate lookup request from peer " + request.getId() + " for product" +
+                        " " + request.getProduct());
                 streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
             } else {
-                logger.info("Flood Lookup request");
+                logger.info("Flood Lookup request from peer " + request.getId() + " for product " + request.getProduct());
                 Pair<Integer, String> lookupSender = new Pair<>(request.getId(), request.getProduct());
                 lookupSenderList.add(lookupSender);
                 List<PeerId> sellerList = lookup(request.getProduct(), request.getHopCount() - 1);
                 sellerList.forEach(streamObserver::onNext);
                 lookupSenderList.remove(lookupSender);
-                logger.info("Sent back results for lookup request");
+                logger.info("Sent back results for lookup request from peer " + request.getId() + " for product " + request.getProduct());
             }
             streamObserver.onCompleted();
         }
