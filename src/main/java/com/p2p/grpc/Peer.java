@@ -1,7 +1,5 @@
 package com.p2p.grpc;
 
-import java.util.List;
-
 public interface Peer {
     /**
      * Call a RPC lookup to lookup for seller peer
@@ -11,7 +9,8 @@ public interface Peer {
     void lookup(String product, int hopCount);
 
     /**
-     * Right now, I haven't made use of this function yet!
+     * Implemented in the Seller class
+     * For the Seller to reply back to the Buyer
      * */
     void reply(PeerId buyerId, PeerId sellerId);
 

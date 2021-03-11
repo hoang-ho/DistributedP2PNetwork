@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -36,7 +37,7 @@ public class Seller extends PeerImpl {
         this.stock = amount;
         this.replyPath = new ArrayList<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbors)).build();
     }
 
     public Seller(int id, int KNeighbors) {
@@ -44,6 +45,9 @@ public class Seller extends PeerImpl {
         this.replyPath = new ArrayList<>();
     }
 
+    /**
+     * Reply request from Seller to Buyer
+     * */
     @Override
     public void reply(PeerId buyer, PeerId seller) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(buyer.getIPAddress(),
@@ -56,6 +60,7 @@ public class Seller extends PeerImpl {
         logger.info("Reply path size " + replyRequest.getPathCount());
         stub.replyRPC(replyRequest);
         channel.shutdown();
+        logger.info("Done Reply");
     }
 
     /**
@@ -65,6 +70,10 @@ public class Seller extends PeerImpl {
      * (2) The lookupRPC in the Seller will decide whether to propagate or to reply!
      * */
     private class MarketplaceSellerImpl extends PeerImpl.MarketPlaceImpl {
+        /**
+         * This would returns an ack empty message and check if it can reply.
+         * If the Seller isn't selling the product, it call a helper function to flood the request
+         * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
             logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getFromNode() + " " +
@@ -95,6 +104,11 @@ public class Seller extends PeerImpl {
             }
         }
 
+        /**
+         * THis is a synchronized method so only one thread can access it at a time
+         * It first verifies again that the buy request is for the product it currently has
+         * If the buy product is invalid, then it returns an error message
+         * */
         @Override
         public synchronized void buyRPC(BuyRequest buyRequest, StreamObserver<Ack> streamObserver) {
             logger.info("Receive a buy request at " + Seller.this.getPort() + " from peer " + buyRequest.getId() + " " +
@@ -161,7 +175,8 @@ public class Seller extends PeerImpl {
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
                 this.setPort(Integer.parseInt(vals[2]));
                 this.setProduct(vals[3]);
-                this.amount = Integer.parseInt(vals[4]);
+                this.stock = Integer.parseInt(vals[4]);
+                this.amount = stock;
                 for (int i = 5; i < vals.length; i+=2) {
                     PeerId neighbor =
                             PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
@@ -171,7 +186,7 @@ public class Seller extends PeerImpl {
             }
         }
         this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor())).build();
+                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(2 * this.getNumberNeighbor())).build();
 
         this.startServer();
         this.blockUntilShutdown();

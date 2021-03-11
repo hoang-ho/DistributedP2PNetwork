@@ -38,7 +38,7 @@ public class PeerImpl implements Peer{
         this.neighbors = new HashMap<>();
         this.lookupSenderList = new ArrayList<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbor)).build();
     }
 
     public PeerImpl(int id, int KNeighbor) {
@@ -88,12 +88,12 @@ public class PeerImpl implements Peer{
 
     /**
      * Server side code for each RPC call
-     * The Buyer and the general peer will use this server code
-     * The Seller will override this implementation
+     * The Seller will extends this class to override the lookupRPC and the buyRPC
+     * The Buyer will override this implementation for replyRPC
      * */
     class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
         /**
-         * Seller and no-role peer floods the request to its neighbors
+         * The No-role peer floods the request to its neighbors
          * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
@@ -112,6 +112,9 @@ public class PeerImpl implements Peer{
             }
         }
 
+        /**
+         * This would return an ack empty message and call a helper function to traverse path the path
+         * */
         @Override
         public void replyRPC(ReplyRequest request, StreamObserver<Empty> streamObserver) {
             // Traverse the reverse path
@@ -231,7 +234,8 @@ public class PeerImpl implements Peer{
             }
         }
 
-        this.server = ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
+        this.server =
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbor)).build();
 
         this.startServer();
         this.blockUntilShutdown();

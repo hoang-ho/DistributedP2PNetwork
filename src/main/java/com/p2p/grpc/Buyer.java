@@ -34,7 +34,7 @@ public class Buyer extends PeerImpl{
         this.buyItems = new ConcurrentHashMap<>();
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbors)).build();
     }
 
     public Buyer(int id, int KNeighbor){
@@ -109,6 +109,10 @@ public class Buyer extends PeerImpl{
         }
     }
 
+    /**
+     * A class that extends PeerImpl.MarketPlaceImpl to override replyRPC
+     * Need to check if this Buyer is the original sender of the lookup request
+     * */
     private class MarketPlaceBuyerImpl extends PeerImpl.MarketPlaceImpl {
         @Override
         public void replyRPC(ReplyRequest request, StreamObserver<Empty> streamObserver) {
@@ -162,7 +166,7 @@ public class Buyer extends PeerImpl{
             }
         }
         this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor())).build();
+                ServerBuilder.forPort(this.getPort()).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(2 * this.getNumberNeighbor())).build();
 
         this.startServer();
 
@@ -175,7 +179,7 @@ public class Buyer extends PeerImpl{
                 this.lookup(this.product.name(), 2);
 
                 try {
-                    Thread.sleep(10000); // sleep a little bit
+                    Thread.sleep(3000); // sleep a little bit
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -183,6 +187,7 @@ public class Buyer extends PeerImpl{
                 if (this.potentialSellers.size() > 0 ) {
                     int index = RANDOM.nextInt(this.potentialSellers.size());
                     PeerId seller = this.potentialSellers.get(index);
+                    this.potentialSellers.clear();
                     this.buy(seller);
                 }
             });
