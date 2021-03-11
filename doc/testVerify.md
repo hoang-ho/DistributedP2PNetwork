@@ -21,7 +21,7 @@ Paste the following in the config file:
 4 seller 8084 boar 3 3 8083
 ```
 
-Run the test.sh file in the test directory or open up 5 terminals to run the test case. It's easier to see the log if open up 5 terminals
+Open up 5 terminals to run the test case. It's easier to see the log if open up 5 terminals
 
 Seller  terminal
 
