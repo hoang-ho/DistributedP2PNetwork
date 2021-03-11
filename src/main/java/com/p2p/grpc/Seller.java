@@ -1,11 +1,16 @@
 package com.p2p.grpc;
 
-import com.p2p.utils.Pair;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -18,10 +23,10 @@ import java.util.logging.Logger;
 public class Seller extends PeerImpl {
     private Product product;
     private int amount;
-    private final int stock;
-    private final Server server;
+    private int stock;
+    private Server server;
     private static Random RANDOM = new Random(0);
-
+    private List<Integer> replyPath;
 
     private static final Logger logger = Logger.getLogger(Seller.class.getName());
     public Seller(int id, String IPAddress, int port, int KNeighbors, Product product, int amount) {
@@ -29,8 +34,28 @@ public class Seller extends PeerImpl {
         this.product = product;
         this.amount =amount;
         this.stock = amount;
+        this.replyPath = new ArrayList<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(10)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors)).build();
+    }
+
+    public Seller(int id, int KNeighbors) {
+        super(id, KNeighbors);
+        this.replyPath = new ArrayList<>();
+    }
+
+    @Override
+    public void reply(PeerId buyer, PeerId seller) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(buyer.getIPAddress(),
+                    buyer.getPort()).usePlaintext().build();
+        MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+        logger.info("Send a reply request to peer " + buyer.getId() + " at port " + buyer.getIPAddress() + " " +
+                    + buyer.getPort() + " for product " + product);
+        ReplyRequest replyRequest =
+                ReplyRequest.newBuilder().setSellerId(seller).setProduct(this.product.name()).addAllPath(replyPath).build();
+        logger.info("Reply path size " + replyRequest.getPathCount());
+        stub.replyRPC(replyRequest);
+        channel.shutdown();
     }
 
     /**
@@ -39,31 +64,35 @@ public class Seller extends PeerImpl {
      * (1) only the Seller can sell - the buyRPC server code should only for the server
      * (2) The lookupRPC in the Seller will decide whether to propagate or to reply!
      * */
-    private class MarketplaceSellerImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
+    private class MarketplaceSellerImpl extends PeerImpl.MarketPlaceImpl {
         @Override
-        public void lookupRPC(LookUpRequest request, StreamObserver<PeerId> streamObserver) {
-            logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getId() + " " +
+        public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
+            logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getFromNode() + " " +
                     " for product " + request.getProduct());
+            streamObserver.onNext(Empty.newBuilder().build());
+            streamObserver.onCompleted();
+
             // propagate the lookup or return a reply
             // if the seller is selling the product
             if (request.getProduct().equals(product.name())) {
-                logger.info("Reply to lookup request from peer " + request.getId() + " for product " + request.getProduct());
-                streamObserver.onNext(PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build());
+                logger.info("Reply to lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
+                synchronized (this) {
+                    replyPath.addAll(request.getPathList());
+                    PeerId fromNode = Seller.this.getNeighbor(replyPath.remove(replyPath.size() - 1));
+                    PeerId seller =
+                            PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build();
+                    Seller.this.reply(fromNode, seller);
+                    replyPath.clear();
+                }
+
             } else if (request.getHopCount() == 1) {
                 // if hopCount is 1 then cannot flood further
-                logger.info("Invalidate lookup request from peer " + request.getId() + " for product" +
+                logger.info("Invalidate lookup request from peer " + request.getFromNode() + " for product" +
                         " " + request.getProduct());
-                streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
             } else {
-                logger.info("Flood Lookup request from peer " + request.getId() + " for product " + request.getProduct());
-                Pair<Integer, String> lookupSender = new Pair<>(request.getId(), request.getProduct());
-                Seller.this.lookupSenderList.add(lookupSender);
-                List<PeerId> sellerList = Seller.this.lookup(request.getProduct(), request.getHopCount() - 1);
-                Seller.this.lookupSenderList.remove(lookupSender);
-                sellerList.forEach(streamObserver::onNext);
-                logger.info("Sent back results for lookup request from peer " + request.getId() + " for product " + request.getProduct());
+                logger.info("Flood Lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
+                floodLookUp(request);
             }
-            streamObserver.onCompleted();
         }
 
         @Override
@@ -92,8 +121,7 @@ public class Seller extends PeerImpl {
         if (amount == 0) {
             logger.info(product.name() + " runs out!!!! Restocking");
             // randomize and restock!
-            int val = RANDOM.nextInt(4);
-            product = Product.values()[val];
+            product = Product.values()[RANDOM.nextInt(3)];
             amount = stock;
             logger.info("After randomize a new product and restock, now selling " + product.name());
         }
@@ -118,19 +146,46 @@ public class Seller extends PeerImpl {
         }
     }
 
+    public void setProduct(String product) {
+        this.product = Product.valueOf(product.toUpperCase());
+    }
+
+    public void run() throws IOException {
+        FileInputStream fstream = new FileInputStream("Config.txt");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String strLine;
+        while ((strLine = br.readLine()) != null)   {
+            // Print the content on the console
+            String[] vals = strLine.split(" ");
+
+            if (Integer.parseInt(vals[0]) ==  this.getId()) {
+                this.setPort(Integer.parseInt(vals[2]));
+                this.setProduct(vals[3]);
+                this.amount = Integer.parseInt(vals[4]);
+                for (int i = 5; i < vals.length; i+=2) {
+                    PeerId neighbor =
+                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
+                    this.addNeighbor(neighbor);
+                }
+                break;
+            }
+        }
+        this.server =
+                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor())).build();
+
+        this.startServer();
+        this.blockUntilShutdown();
+    }
+
 
     public static void main(String[] args) {
         // args: id, port, product, amount, neighborId, neighborPort
         // test case 1 and 3
-        Seller seller = new Seller(Integer.parseInt(args[0]),"localhost", Integer.parseInt(args[1]), 1,
-                Product.valueOf(args[2].toUpperCase()), Integer.parseInt(args[3]));
-        PeerId peer1 =
-                PeerId.newBuilder().setId(Integer.parseInt(args[4])).setIPAddress("localhost").setPort(Integer.parseInt(args[5])).build();
-        PeerId peer2 =
-                PeerId.newBuilder().setId(Integer.parseInt(args[6])).setIPAddress("localhost").setPort(Integer.parseInt(args[7])).build();
-        seller.addNeighbor(peer1);
-        seller.addNeighbor(peer2);
-        seller.startServer();
-        seller.blockUntilShutdown();
+        Seller seller = new Seller(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        try {
+            seller.run();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

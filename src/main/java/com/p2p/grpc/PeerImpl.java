@@ -7,97 +7,64 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class PeerImpl implements Peer{
 
-    private List<PeerId> neighbors;
-    private final String IPAddress;
-    private final int port;
-    private final int id;
-    private final Server server;
-    public Set<Pair<Integer, String>> lookupSenderList;
-
+    private Map<Integer, PeerId> neighbors;
+    private String IPAddress;
+    private int port;
+    private int id;
+    private Server server;
+    public List<Pair<Integer, String>> lookupSenderList;
+    public int KNeighbor;
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
     public PeerImpl(int id, String IPAddress, int port, int KNeighbor) {
         this.id = id;
         this.IPAddress = IPAddress;
         this.port = port;
-        this.neighbors = new ArrayList<>();
-        this.lookupSenderList = Collections.synchronizedSet(new HashSet<>());
+        this.KNeighbor = KNeighbor;
+        this.neighbors = new HashMap<>();
+        this.lookupSenderList = new ArrayList<>();
         this.server =
                 ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
     }
 
-    /**
-     * Implementation lookup interface
-     * This lookup will do a lookupRPC call to all its neighbors
-     *
-     * @return a list PeerId each of which is a reference to the seller
-     * */
-    @Override
-    public List<PeerId> lookup(String product, int hopCount) {
-        LookUpRequest request = LookUpRequest.newBuilder().setId(this.id).setProduct(product).setHopCount(hopCount).build();
-        Thread[] lookupThread = new Thread[neighbors.size()];
-        List<PeerId> sellerList = Collections.synchronizedList(new ArrayList<>());
-        int counter = 0;
-        // stop flooding back the to where we was before
-        List<PeerId> toFlood =
-                neighbors.stream().filter(e -> !lookupSenderList.contains(new Pair<>(e.getId(), product))).collect(Collectors.toList());
-        for (PeerId neighbor: toFlood) {
-            lookupThread[counter] = new Thread(() -> {
-                ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbor.getIPAddress(),
-                        neighbor.getPort()).usePlaintext().build();
-                // Wait for the server to start!
-                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-                logger.info("Send a lookup request to peer " + neighbor.getId() + " at port " + neighbor.getIPAddress() + " " +
-                                + neighbor.getPort() + " for product " + product);
-                Iterator<PeerId> sellers = stub.lookupRPC(request);
-                logger.info("Lookup request return");
-                for (int i = 0; sellers.hasNext(); i++) {
-                    PeerId seller = sellers.next();
-                    if (seller.getId() == -1) {
-                        continue;
-                    }
-                    sellerList.add(seller);
-                }
-                channel.shutdown();
-            });
-            lookupThread[counter].start();
-            counter++;
-        }
-
-        for (int i = 0; i < counter; i++) {
-            try {
-                lookupThread[i].join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return sellerList;
+    public PeerImpl(int id, int KNeighbor) {
+        this.id = id;
+        this.IPAddress = "localhost";
+        this.neighbors = new HashMap<>();
+        this.lookupSenderList = new ArrayList<>();
+        this.KNeighbor = KNeighbor;
     }
 
     /**
-     * This doesn't do anything for now
+     * Lookup implemented in the Buyer
      * */
     @Override
-    public PeerId reply(PeerId peerId) {
-        return null;
+    public void lookup(String product, int hopCount) {
     }
 
     /**
-     * Nothing going on here! Only buyer can buy
+     * Reply implemented in Seller
+     * */
+    @Override
+    public void reply(PeerId buyer, PeerId seller) {
+    }
+
+    /**
+     * Buy implemented in Buyer
      * */
     @Override
     public void buy(PeerId peerId) { }
@@ -129,48 +96,154 @@ public class PeerImpl implements Peer{
          * Seller and no-role peer floods the request to its neighbors
          * */
         @Override
-        public void lookupRPC(LookUpRequest request, StreamObserver<PeerId> streamObserver) {
-            logger.info("Receive lookup request at " + port + " from peer " + request.getId() + " for product " + request.getProduct());
+        public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
+            logger.info("Receive lookup request at " + port + " from peer " + request.getFromNode() + " for product " + request.getProduct());
             // propagate the lookup or return a reply
-            if (request.getHopCount() == 1) {
-                logger.info("Invalidate lookup request from peer " + request.getId() + " for product" +
-                        " " + request.getProduct());
-                streamObserver.onNext(PeerId.newBuilder().setId(-1).build());
-            } else {
-                logger.info("Flood Lookup request from peer " + request.getId() + " for product " + request.getProduct());
-                Pair<Integer, String> lookupSender = new Pair<>(request.getId(), request.getProduct());
-                lookupSenderList.add(lookupSender);
-                List<PeerId> sellerList = lookup(request.getProduct(), request.getHopCount() - 1);
-                sellerList.forEach(streamObserver::onNext);
-                lookupSenderList.remove(lookupSender);
-                logger.info("Sent back results for lookup request from peer " + request.getId() + " for product " + request.getProduct());
-            }
+            streamObserver.onNext(Empty.newBuilder().build());
             streamObserver.onCompleted();
+            if (request.getHopCount() == 1) {
+                // cancel the request
+                logger.info("Invalidate lookup request from peer " + request.getFromNode() + " for product" +
+                        " " + request.getProduct());
+            } else {
+                // Flood the lookup request
+                logger.info("Flood Lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
+                floodLookUp(request);
+            }
+        }
+
+        @Override
+        public void replyRPC(ReplyRequest request, StreamObserver<Empty> streamObserver) {
+            // Traverse the reverse path
+            logger.info("Receive Reply request at " + PeerImpl.this.id + ". Size of reverse path " + request.getPathCount());
+            logger.info("Continue down the path for reply");
+            streamObserver.onNext(Empty.newBuilder().build());
+            streamObserver.onCompleted();
+            reverseReply(request);
         }
     }
 
-    public void addNeighbor(PeerId peer) {
-        this.neighbors.add(peer);
+    public void floodLookUp(LookUpRequest request) {
+        Pair<Integer, String> fromNode = new Pair<>(request.getFromNode(), request.getProduct());
+        lookupSenderList.add(fromNode);
+        // save the path for the reply
+        List<Integer> path = new ArrayList<>(request.getPathList());
+        path.add(this.id);
+        LookUpRequest newRequest =
+                LookUpRequest.newBuilder().setFromNode(this.id).setProduct(request.getProduct()).setHopCount(request.getHopCount() - 1).addAllPath(path).build();
+
+        Thread[] lookupThread = new Thread[neighbors.size()];
+        int counter = 0;
+        // stop flooding back the to where we was before
+        // filter out the neighbor who sent us the lookup request for the product
+        List<PeerId> toFlood =
+                neighbors.values().stream().filter(e -> !lookupSenderList.contains(new Pair<>(e.getId(), request.getProduct()))).collect(Collectors.toList());
+
+        for (PeerId neighbor: toFlood) {
+            lookupThread[counter] = new Thread(() -> {
+                // Open a new channel for
+                ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbor.getIPAddress(),
+                        neighbor.getPort()).usePlaintext().build();
+                // Wait for the server to start!
+                MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+                logger.info("Send a lookup request to peer " + neighbor.getId() + " at port " + neighbor.getIPAddress() + " " +
+                        + neighbor.getPort() + " for product " + request.getProduct());
+
+                stub.lookupRPC(newRequest);
+                channel.shutdown();
+            });
+            lookupThread[counter].start();
+            counter++;
+        }
+
+        for (int i = 0; i < counter; i++) {
+            try {
+                lookupThread[i].join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        lookup(request.getProduct(), request.getHopCount() - 1);
+        lookupSenderList.remove(fromNode);
+        path.clear();
+
     }
 
+    public void reverseReply(ReplyRequest request) {
+        List<Integer> path = new ArrayList<>(request.getPathList());
+        PeerId fromNode = neighbors.get(path.remove(path.size() - 1));
+        PeerId seller = request.getSellerId();
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(fromNode.getIPAddress(),
+                fromNode.getPort()).usePlaintext().build();
+        MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
+        logger.info("Send a reply request to peer " + fromNode.getId() + " at " + fromNode.getIPAddress() + " " + fromNode.getPort());
+        ReplyRequest replyRequest =
+                ReplyRequest.newBuilder().setSellerId(seller).setProduct(request.getProduct()).addAllPath(path).build();
+        logger.info("Size of path " + replyRequest.getPathCount());
+        stub.replyRPC(replyRequest);
+        channel.shutdown();
+    }
+
+
+    public void addNeighbor(PeerId peer) {
+        this.neighbors.put(peer.getId(), peer);
+    }
+
+    public PeerId getNeighbor(int id) {
+        return this.neighbors.get(id);
+    }
+
+    public int getNumberNeighbor() {
+        return this.KNeighbor;
+    }
     public int getId() { return id; }
 
     public int getPort() {
         return port;
     }
 
+    public Map<Integer, PeerId> getAllNeighbors() {
+        return this.neighbors;
+    }
+
     public String getIPAddress() { return IPAddress; }
 
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void run() throws IOException {
+        FileInputStream fstream = new FileInputStream("Config.txt");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String strLine;
+        while ((strLine = br.readLine()) != null)   {
+            // Print the content on the console
+            String[] vals = strLine.split(" ");
+            if (Integer.parseInt(vals[0]) ==  this.id) {
+                this.port = Integer.parseInt(vals[2]);
+                for (int i = 3; i < vals.length; i+=2) {
+                    PeerId neighbor =
+                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
+                    this.addNeighbor(neighbor);
+                }
+                break;
+            }
+        }
+
+        this.server = ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor)).build();
+
+        this.startServer();
+        this.blockUntilShutdown();
+
+    }
+
     public static void main(String[] args) {
-        // id,IP address, port and KNeigbors
-        PeerImpl peer = new PeerImpl(Integer.parseInt(args[0]),"localhost", Integer.parseInt(args[1]), 1);
-        PeerId neighbor1 =
-                PeerId.newBuilder().setId(Integer.parseInt(args[2])).setIPAddress("localhost").setPort(Integer.parseInt(args[3])).build();
-        PeerId neighbor2 =
-                PeerId.newBuilder().setId(Integer.parseInt(args[4])).setIPAddress("localhost").setPort(Integer.parseInt(args[5])).build();
-        peer.addNeighbor(neighbor1);
-        peer.addNeighbor(neighbor2);
-        peer.startServer();
-        peer.blockUntilShutdown();
+        PeerImpl peer = new PeerImpl(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        try {
+            peer.run();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

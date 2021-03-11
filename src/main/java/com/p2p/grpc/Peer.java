@@ -7,14 +7,13 @@ public interface Peer {
      * Call a RPC lookup to lookup for seller peer
      * @param product is a string value for the name of the product
      * @param hopCount is an integer value for the hopCount
-     * @return a PeerId object containing reference to the Seller
      * */
-    List<PeerId> lookup(String product, int hopCount);
+    void lookup(String product, int hopCount);
 
     /**
      * Right now, I haven't made use of this function yet!
      * */
-    PeerId reply(PeerId peerId);
+    void reply(PeerId buyerId, PeerId sellerId);
 
     /**
      * Perform a buy operation. Buyer send request directly to the Seller.

@@ -1,0 +1,4 @@
+0 buyer 8080 fish 2 8082
+1 buyer 8081 fish 2 8082
+2 peer 8082 0 8080 1 8081 3 8083
+3 seller 8083 fish 3 2 8082
