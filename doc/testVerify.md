@@ -34,9 +34,9 @@ $ gradle p2pSeller --args="4 1"
 Peer 3 terminal
 
 ```
-// to create a peer with peerId 2 with 1 neighbors
+// to create a peer with peerId 3 with 4 neighbors
 
-$ gradle p2pPeer --args="3 1" 
+$ gradle p2pPeer --args="3 4" 
 ```
 
 Buyer 0 terminal 
@@ -382,7 +382,7 @@ INFO: Currently buying SALT
 
 **Test case 2**:
 
-Paste the following in the config file:
+Paste the following in the Config.txt file:
 
 ```
 0 buyer 8080 fish 2 8082
@@ -411,7 +411,7 @@ Due to us running the test on one single, allows the program to run for at least
 " from the Seller terminal. Request arrives at similar time even though the log is at different time. This is because we are testing on a single machine, and each of the Seller, Buyer are multi-threading process. 
 The time gap between a lookup and a buy request is 10 seconds, because I force the thread to sleep for 10 seconds 
 
-There will be two cases that happens: 
+There will be two cases that happen: 
 
 * The Seller restock and choose the same product to sell, then both buyers would be able to buy product
 * The Seller restock adn choose a different product to sell, then the buyer that comes later may not be able to buy the product and will receive a buy unsucessful message

@@ -6,7 +6,8 @@
 ```
 project
 │   README.md
-│   build.gradle    
+│   build.gradle
+│   Config.txt    
 │
 └───doc
 │   │   doc.md // design description

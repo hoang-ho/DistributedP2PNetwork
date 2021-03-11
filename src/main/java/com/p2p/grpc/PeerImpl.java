@@ -1,6 +1,5 @@
 package com.p2p.grpc;
 
-import com.p2p.utils.Pair;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class PeerImpl implements Peer{
 
@@ -26,7 +24,6 @@ public class PeerImpl implements Peer{
     private int port;
     private int id;
     private Server server;
-    public List<Pair<Integer, String>> lookupSenderList;
     public int KNeighbor;
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
@@ -36,7 +33,6 @@ public class PeerImpl implements Peer{
         this.port = port;
         this.KNeighbor = KNeighbor;
         this.neighbors = new HashMap<>();
-        this.lookupSenderList = new ArrayList<>();
         this.server =
                 ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbor)).build();
     }
@@ -45,7 +41,6 @@ public class PeerImpl implements Peer{
         this.id = id;
         this.IPAddress = "localhost";
         this.neighbors = new HashMap<>();
-        this.lookupSenderList = new ArrayList<>();
         this.KNeighbor = KNeighbor;
     }
 
@@ -127,9 +122,6 @@ public class PeerImpl implements Peer{
     }
 
     public void floodLookUp(LookUpRequest request) {
-        Pair<Integer, String> fromNode = new Pair<>(request.getFromNode(), request.getProduct());
-        lookupSenderList.add(fromNode);
-        // save the path for the reply
         List<Integer> path = new ArrayList<>(request.getPathList());
         path.add(this.id);
         LookUpRequest newRequest =
@@ -137,12 +129,13 @@ public class PeerImpl implements Peer{
 
         Thread[] lookupThread = new Thread[neighbors.size()];
         int counter = 0;
-        // stop flooding back the to where we was before
-        // filter out the neighbor who sent us the lookup request for the product
-        List<PeerId> toFlood =
-                neighbors.values().stream().filter(e -> !lookupSenderList.contains(new Pair<>(e.getId(), request.getProduct()))).collect(Collectors.toList());
 
-        for (PeerId neighbor: toFlood) {
+        for (PeerId neighbor: neighbors.values()) {
+            // Ignore the neighbor whom send us the request
+            if (neighbor.getId() == request.getFromNode()) {
+                continue;
+            }
+
             lookupThread[counter] = new Thread(() -> {
                 // Open a new channel for
                 ManagedChannel channel = ManagedChannelBuilder.forAddress(neighbor.getIPAddress(),
@@ -166,10 +159,6 @@ public class PeerImpl implements Peer{
                 throw new RuntimeException(e);
             }
         }
-        lookup(request.getProduct(), request.getHopCount() - 1);
-        lookupSenderList.remove(fromNode);
-        path.clear();
-
     }
 
     public void reverseReply(ReplyRequest request) {
