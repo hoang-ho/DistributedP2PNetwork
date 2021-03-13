@@ -55,6 +55,14 @@ sourceSets {
     }
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.p2p.grpc.Runner'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 
 protobuf {
     protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
@@ -79,6 +87,11 @@ task p2pBuyer(type: JavaExec) {
 task p2pPeer(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = "com.p2p.grpc.PeerImpl"
+}
+
+task p2pConfigure(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = "com.p2p.configure.ConfigureNetwork"
 }
 
 test {

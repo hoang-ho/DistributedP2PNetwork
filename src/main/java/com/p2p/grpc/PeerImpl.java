@@ -214,9 +214,9 @@ public class PeerImpl implements Peer{
             String[] vals = strLine.split(" ");
             if (Integer.parseInt(vals[0]) ==  this.id) {
                 this.port = Integer.parseInt(vals[2]);
-                for (int i = 3; i < vals.length; i+=2) {
+                for (int i = 4; i < vals.length; i+=3) {
                     PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
+                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
                     this.addNeighbor(neighbor);
                 }
                 break;

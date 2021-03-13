@@ -42,6 +42,7 @@ public class Buyer extends PeerImpl{
         this.buyItems = new ConcurrentHashMap<>();
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
     }
+
     /**
      * Implementation lookup interface for the buyer
      * This lookup will do a lookupRPC call to all its neighbors
@@ -53,8 +54,6 @@ public class Buyer extends PeerImpl{
 
         Thread[] lookupThread = new Thread[this.getNumberNeighbor()];
         int counter = 0;
-        // stop flooding back the to where we was before
-        // filter out the neighbor who sent us the lookup request for the product
 
         for (PeerId neighbor: this.getAllNeighbors().values()){
             lookupThread[counter] = new Thread(() -> {
@@ -156,10 +155,10 @@ public class Buyer extends PeerImpl{
 
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
                 this.setPort(Integer.parseInt(vals[2]));
-                this.setProduct(vals[3]);
-                for (int i = 4; i < vals.length; i+=2) {
+                this.setProduct(vals[4]);
+                for (int i = 5; i < vals.length; i+=3) {
                     PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
+                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
                     this.addNeighbor(neighbor);
                 }
                 break;
@@ -212,7 +211,7 @@ public class Buyer extends PeerImpl{
     // The buyer keeps sending buy messages
     public static void main(String[] args) {
         // args: id port product neighborId neighborPort
-        // test case 1 and 2 d
+        // test case 1 and 2
         Buyer buyer = new Buyer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         try {
             buyer.run();

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -174,12 +173,12 @@ public class Seller extends PeerImpl {
 
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
                 this.setPort(Integer.parseInt(vals[2]));
-                this.setProduct(vals[3]);
-                this.stock = Integer.parseInt(vals[4]);
+                this.setProduct(vals[4]);
+                this.stock = Integer.parseInt(vals[5]);
                 this.amount = stock;
-                for (int i = 5; i < vals.length; i+=2) {
+                for (int i = 6; i < vals.length; i+=3) {
                     PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+1])).build();
+                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
                     this.addNeighbor(neighbor);
                 }
                 break;

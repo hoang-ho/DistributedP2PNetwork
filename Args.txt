@@ -1,0 +1,11 @@
+N 5
+K 4
+buyerNum 3
+sellerNum 1
+product boar
+stock 3
+0 localhost 8080
+1 localhost 8081
+2 localhost 8082
+3 localhost 8083
+4 localhost 8084
