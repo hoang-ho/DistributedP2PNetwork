@@ -29,7 +29,7 @@ public class Runner {
                     // create a buyer
                     Buyer buyer = new Buyer(id, K);
                     buyer.run();
-                } else if (vals[0].equals("seller")) {
+                } else if (vals[3].equals("seller")) {
                     // create a seller
                     Seller seller = new Seller(id, K);
                     seller.run();

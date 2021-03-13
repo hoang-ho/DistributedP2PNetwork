@@ -212,6 +212,9 @@ public class PeerImpl implements Peer{
         while ((strLine = br.readLine()) != null)   {
             // Print the content on the console
             String[] vals = strLine.split(" ");
+            if (vals[0].equals("N") || vals[0].equals("K")) {
+                continue;
+            }
             if (Integer.parseInt(vals[0]) ==  this.id) {
                 this.port = Integer.parseInt(vals[2]);
                 for (int i = 4; i < vals.length; i+=3) {

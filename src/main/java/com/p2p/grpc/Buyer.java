@@ -152,7 +152,9 @@ public class Buyer extends PeerImpl{
         while ((strLine = br.readLine()) != null)   {
             // Print the content on the console
             String[] vals = strLine.split(" ");
-
+            if (vals[0].equals("N") || vals[0].equals("K")) {
+                continue;
+            }
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
                 this.setPort(Integer.parseInt(vals[2]));
                 this.setProduct(vals[4]);
