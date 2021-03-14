@@ -38,7 +38,7 @@ public class Seller extends PeerImpl {
         this.stock = amount;
         this.replyPath = new ConcurrentHashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbors)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors)).build();
     }
 
     public Seller(int id, int KNeighbors) {
@@ -187,7 +187,7 @@ public class Seller extends PeerImpl {
             }
         }
         this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(2 * this.getNumberNeighbor())).build();
+                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor())).build();
 
         this.startServer();
         this.blockUntilShutdown();

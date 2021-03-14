@@ -130,8 +130,6 @@ public class Buyer extends PeerImpl{
             } else {
                 // continue down the path
                 logger.info("Continue down the path for reply");
-                streamObserver.onNext(Empty.newBuilder().build());
-                streamObserver.onCompleted();
                 reverseReply(request);
             }
         }

@@ -41,6 +41,11 @@ $ ./gradlew clean build
 
 **hopcount** is hardcoded to be 1 for milestone 1. Professor confirmed that it's okay to have the two peers: one buyer, one seller for milestone 1.
 
+Image ID for the customized EC2 instance:
+
+{
+"ImageId": "ami-01c10c86c813b4841"
+}
 
 ### TODO
 - [X] Flood Lookup Request
@@ -49,6 +54,6 @@ $ ./gradlew clean build
 - [X] Test case 2: Race condition 2 buyers 1 seller
 - [X] Test case 3: 7 peers 3 Buyers 2 Sellers 2 peers
 - [X] Running test case on a single server EC2
-- [] Deploy test case on EC2 cluster 
+- [] Deploy test case on EC2 cluster
 - [] Measure latency
 - [] Dynamically generate a network (e.g. assign role for peer and assign their neighbors)

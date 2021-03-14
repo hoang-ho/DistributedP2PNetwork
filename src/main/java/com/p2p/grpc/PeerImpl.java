@@ -187,7 +187,7 @@ public class PeerImpl implements Peer{
     }
 
     public int getNumberNeighbor() {
-        return this.KNeighbor;
+        return this.neighbors.size();
     }
     public int getId() { return id; }
 

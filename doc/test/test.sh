@@ -8,10 +8,11 @@ echo "If you encounter any issue with running aws, try troubleshooting with this
 echo ""
 echo "Let's start!"
 
-# Compute the code
-cd ../..
-
-./gradlew clean build
+# Step 1: Create instance
+# Save all the EC2 PrivateDnsName to a file
+# Step 2: git clone the project
+# Compile the project
+# Run the project
 
 # Start an EC2 instance
 aws ec2 run-instances --image-id ami-0fc61db8544a617ed --instance-type t2.micro --key-name 677kp > instance.json
@@ -26,3 +27,5 @@ PublicDnsName=$(grep -m 1 '^ *"PublicDnsName":' runningInstance.json | awk '{ pr
 scp -i "677kp.pem" Config.txt ec2-user@$PublicDnsName
 
 ssh -i "677kp.pem" ec2-user@$PublicDnsName
+
+./gradlew clean build
