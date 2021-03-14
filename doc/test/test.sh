@@ -13,9 +13,6 @@ cd ../..
 
 ./gradlew clean build
 
-# Configure the network
-gradle p2pConfigure
-
 # Start an EC2 instance
 aws ec2 run-instances --image-id ami-0fc61db8544a617ed --instance-type t2.micro --key-name 677kp > instance.json
 

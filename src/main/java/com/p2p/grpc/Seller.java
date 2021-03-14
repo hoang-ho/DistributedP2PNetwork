@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -26,7 +28,7 @@ public class Seller extends PeerImpl {
     private int stock;
     private Server server;
     private static Random RANDOM = new Random(0);
-    private List<Integer> replyPath;
+    private Map<Integer, List<Integer>> replyPath;
 
     private static final Logger logger = Logger.getLogger(Seller.class.getName());
     public Seller(int id, String IPAddress, int port, int KNeighbors, Product product, int amount) {
@@ -34,32 +36,35 @@ public class Seller extends PeerImpl {
         this.product = product;
         this.amount =amount;
         this.stock = amount;
-        this.replyPath = new ArrayList<>();
+        this.replyPath = new ConcurrentHashMap<>();
         this.server =
                 ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbors)).build();
     }
 
     public Seller(int id, int KNeighbors) {
         super(id, KNeighbors);
-        this.replyPath = new ArrayList<>();
+        this.replyPath = new ConcurrentHashMap<>();
     }
 
     /**
      * Reply request from Seller to Buyer
      * */
     @Override
-    public void reply(PeerId buyer, PeerId seller) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(buyer.getIPAddress(),
-                    buyer.getPort()).usePlaintext().build();
+    public void reply(int buyerId, PeerId seller) {
+        List<Integer> path = replyPath.get(buyerId);
+        int previousNodeId = path.remove(path.size() - 1);
+        PeerId previousNode = this.getNeighbor(previousNodeId);
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(previousNode.getIPAddress(), previousNode.getPort()).usePlaintext().build();
         MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
-        logger.info("Send a reply request to peer " + buyer.getId() + " at port " + buyer.getIPAddress() + " " +
-                    + buyer.getPort() + " for product " + product);
+        logger.info("Send a reply request to peer " + previousNode.getId() + " at port " + previousNode.getIPAddress() + " " +
+                    + previousNode.getPort() + " for product " + product);
         ReplyRequest replyRequest =
-                ReplyRequest.newBuilder().setSellerId(seller).setProduct(this.product.name()).addAllPath(replyPath).build();
+                ReplyRequest.newBuilder().setSellerId(seller).setProduct(this.product.name()).addAllPath(path).build();
         logger.info("Reply path size " + replyRequest.getPathCount());
         stub.replyRPC(replyRequest);
         channel.shutdown();
         logger.info("Done Reply");
+        replyPath.remove(buyerId);
     }
 
     /**
@@ -75,7 +80,7 @@ public class Seller extends PeerImpl {
          * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
-            logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getFromNode() + " " +
+            logger.info("Receive lookup request at " + Seller.this.getPort() + " from peer " + request.getBuyer() + " " +
                     " for product " + request.getProduct());
             streamObserver.onNext(Empty.newBuilder().build());
             streamObserver.onCompleted();
@@ -83,22 +88,17 @@ public class Seller extends PeerImpl {
             // propagate the lookup or return a reply
             // if the seller is selling the product
             if (request.getProduct().equals(product.name())) {
-                logger.info("Reply to lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
-                synchronized (this) {
-                    replyPath.addAll(request.getPathList());
-                    PeerId fromNode = Seller.this.getNeighbor(replyPath.remove(replyPath.size() - 1));
-                    PeerId seller =
-                            PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build();
-                    Seller.this.reply(fromNode, seller);
-                    replyPath.clear();
-                }
-
+                logger.info("Reply to lookup request from peer " + request.getBuyer() + " for product " + request.getProduct());
+                replyPath.put(request.getBuyer(), new ArrayList<>(request.getPathList()));
+                PeerId seller =
+                        PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build();
+                Seller.this.reply(request.getBuyer(), seller);
             } else if (request.getHopCount() == 1) {
                 // if hopCount is 1 then cannot flood further
-                logger.info("Invalidate lookup request from peer " + request.getFromNode() + " for product" +
+                logger.info("Invalidate lookup request from peer " + request.getBuyer() + " for product" +
                         " " + request.getProduct());
             } else {
-                logger.info("Flood Lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
+                logger.info("Flood Lookup request from peer " + request.getBuyer() + " for product " + request.getProduct());
                 floodLookUp(request);
             }
         }
@@ -163,14 +163,14 @@ public class Seller extends PeerImpl {
         this.product = Product.valueOf(product.toUpperCase());
     }
 
-    public void run() throws IOException {
-        FileInputStream fstream = new FileInputStream("Config.txt");
+    public void run(String configFile) throws IOException {
+        FileInputStream fstream = new FileInputStream(configFile);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String strLine;
         while ((strLine = br.readLine()) != null)   {
             // Print the content on the console
             String[] vals = strLine.split(" ");
-            if (vals[0].equals("N") || vals[0].equals("K")) {
+            if (vals[0].equals("N") || vals[0].equals("K") || vals[0].equals("hopCount")) {
                 continue;
             }
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
@@ -193,15 +193,4 @@ public class Seller extends PeerImpl {
         this.blockUntilShutdown();
     }
 
-
-    public static void main(String[] args) {
-        // args: id, port, product, amount, neighborId, neighborPort
-        // test case 1 and 3
-        Seller seller = new Seller(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        try {
-            seller.run();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

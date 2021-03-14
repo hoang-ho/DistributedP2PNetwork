@@ -42,9 +42,13 @@ $ ./gradlew clean build
 **hopcount** is hardcoded to be 1 for milestone 1. Professor confirmed that it's okay to have the two peers: one buyer, one seller for milestone 1.
 
 
-### TODO 
-- [X] Milestone 1 test case 1
-- [X] Milestone 1 test case 2
-- [X] Milestone 1 Randomly assigned role
-- [X] Milestone 2 Flooding nonblocking Lookup Request
-- [X] Milestone 2 Synchronization for race condition 
+### TODO
+- [X] Flood Lookup Request
+- [X] Synchronization
+- [X] Test case 1: 1 buyer and 1 seller 
+- [X] Test case 2: Race condition 2 buyers 1 seller
+- [X] Test case 3: 7 peers 3 Buyers 2 Sellers 2 peers
+- [X] Running test case on a single server EC2
+- [] Deploy test case on EC2 cluster 
+- [] Measure latency
+- [] Dynamically generate a network (e.g. assign role for peer and assign their neighbors)

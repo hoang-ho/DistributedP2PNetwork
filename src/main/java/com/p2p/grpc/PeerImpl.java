@@ -34,7 +34,7 @@ public class PeerImpl implements Peer{
         this.KNeighbor = KNeighbor;
         this.neighbors = new HashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbor)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 1)).build();
     }
 
     public PeerImpl(int id, int KNeighbor) {
@@ -55,7 +55,7 @@ public class PeerImpl implements Peer{
      * Reply implemented in Seller
      * */
     @Override
-    public void reply(PeerId buyer, PeerId seller) {
+    public void reply(int buyerId, PeerId seller) {
     }
 
     /**
@@ -92,17 +92,17 @@ public class PeerImpl implements Peer{
          * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
-            logger.info("Receive lookup request at " + port + " from peer " + request.getFromNode() + " for product " + request.getProduct());
+            logger.info("Receive lookup request at " + port + " from peer " + request.getBuyer() + " for product " + request.getProduct());
             // propagate the lookup or return a reply
             streamObserver.onNext(Empty.newBuilder().build());
             streamObserver.onCompleted();
             if (request.getHopCount() == 1) {
                 // cancel the request
-                logger.info("Invalidate lookup request from peer " + request.getFromNode() + " for product" +
+                logger.info("Invalidate lookup request from peer " + request.getBuyer() + " for product" +
                         " " + request.getProduct());
             } else {
                 // Flood the lookup request
-                logger.info("Flood Lookup request from peer " + request.getFromNode() + " for product " + request.getProduct());
+                logger.info("Flood Lookup request from peer " + request.getBuyer() + " for product " + request.getProduct());
                 floodLookUp(request);
             }
         }
@@ -125,14 +125,14 @@ public class PeerImpl implements Peer{
         List<Integer> path = new ArrayList<>(request.getPathList());
         path.add(this.id);
         LookUpRequest newRequest =
-                LookUpRequest.newBuilder().setFromNode(this.id).setProduct(request.getProduct()).setHopCount(request.getHopCount() - 1).addAllPath(path).build();
+                LookUpRequest.newBuilder().setBuyer(request.getBuyer()).setProduct(request.getProduct()).setHopCount(request.getHopCount() - 1).addAllPath(path).build();
 
         Thread[] lookupThread = new Thread[neighbors.size()];
         int counter = 0;
 
         for (PeerId neighbor: neighbors.values()) {
             // Ignore the neighbor whom send us the request
-            if (neighbor.getId() == request.getFromNode()) {
+            if (path.contains(neighbor.getId())) {
                 continue;
             }
 
@@ -205,14 +205,14 @@ public class PeerImpl implements Peer{
         this.port = port;
     }
 
-    public void run() throws IOException {
-        FileInputStream fstream = new FileInputStream("Config.txt");
+    public void run(String configFile) throws IOException {
+        FileInputStream fstream = new FileInputStream(configFile);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String strLine;
         while ((strLine = br.readLine()) != null)   {
             // Print the content on the console
             String[] vals = strLine.split(" ");
-            if (vals[0].equals("N") || vals[0].equals("K")) {
+            if (vals[0].equals("N") || vals[0].equals("K") || vals[0].equals("hopCount")) {
                 continue;
             }
             if (Integer.parseInt(vals[0]) ==  this.id) {
@@ -227,19 +227,10 @@ public class PeerImpl implements Peer{
         }
 
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbor)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 1)).build();
 
         this.startServer();
         this.blockUntilShutdown();
 
-    }
-
-    public static void main(String[] args) {
-        PeerImpl peer = new PeerImpl(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        try {
-            peer.run();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

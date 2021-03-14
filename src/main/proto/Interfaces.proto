@@ -17,7 +17,7 @@ message Empty {
 }
 
 message LookUpRequest {
-  int32 fromNode = 1;
+  int32 buyer = 1;
   string product = 2;
   int32 hopCount = 3;
   repeated int32 path = 4;

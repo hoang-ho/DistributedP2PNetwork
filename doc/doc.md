@@ -363,3 +363,36 @@ public class Seller {
 ```
 
 All RPCs except for buy are non-blocking!
+
+
+# Design for lookup and flooding lookup
+
+1. Synchronous/Blocking Lookup
+
+Previously, I tried out a design with a blocking lookup which returns a reference to the Seller. 
+When a seller opens up threads to send out a lookup request to a neighbor, the lookup will block in that thread until the result of the lookup request returns. 
+
+* Pros: This design is straightforward and minimizes the amount of thread synchronization
+* Cons: Even though a lookup happens in a thread, it blocks that thread, and this can waste resources.
+
+2. Asynchronous/Non-blocking lookup
+
+A non-blocking lookup means that once the buyer sends out a lookup request, it terminates the thread execution, and when the Seller receives the lookup request, it will send out a reply request, which traverses the reverse path back to the Buyer. 
+In order for the reply request to traverse the reverse path back to the Seller, the RPC/RMI lookup request must include the traversal path. 
+Here, I again face a decision-making point: when each peer receives a lookup request, it can either (1) flood the lookup request by calling the local lookup, (2) flood the lookup request by again call the RPC/RMI lookup request
+
+I did explore both options, and for option (1), I find the following situation:
+
+Because the local lookup must be as: lookup(product, hop_count), the question is how would the code inside the local lookup know what path for this request would be? 
+The options I explored to solve this problem is: have a map where the key is (peer_id, request_id) and value is the path, and then have another map where the key is (product, hop_count) and the value is a list of (peer_id, request_id). 
+Then for each peer, they would have a separate thread which will try to flood all the lookup requests it received and empties out the two described maps. 
+But another question arises: for the Buyer, which will have to perform a lookup request for itself and floods the lookup request, how would the code inside the local lookup of the Buyer know whether it is flooding others lookup requests?
+If the buyer is to send out a lookup request for itself, it would have to create a path parameter, and if the buyer is to flood the lookup request for others, it would have to use the two mentioned maps to find the path.
+To this question, I was unable to find an answer. Hence, I decided to not follow this option.
+
+For option (2), what I did is the following:
+
+The local lookup interface would be implemented in the Buyer. What this lookup interface would do is to send out a RPC/RMI lookup request (which includes a path parameter) from Buyer to all of its neighbors. 
+The neighbors can be a no-role peer or a buyer. What the neighbor would do when it receives the lookup request is it would return an acknowledgement for the request and further flood this lookup request via RMI/RPC lookup. 
+When the Seller receives the lookup request, it first checks whether it can reply to the lookup request. 
+If it can, it saves the path to a local variable and then calls the local reply(seller_id, buyer_id).

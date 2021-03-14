@@ -12,7 +12,7 @@ public interface Peer {
      * Implemented in the Seller class
      * For the Seller to reply back to the Buyer
      * */
-    void reply(PeerId buyerId, PeerId sellerId);
+    void reply(int buyerId, PeerId sellerId);
 
     /**
      * Perform a buy operation. Buyer send request directly to the Seller.

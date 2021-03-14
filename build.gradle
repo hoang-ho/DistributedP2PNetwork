@@ -57,7 +57,7 @@ sourceSets {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'com.p2p.configure.Runner'
+        attributes 'Main-Class': 'com.p2p.Runner'
     }
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -89,10 +89,6 @@ task p2pPeer(type: JavaExec) {
     main = "com.p2p.grpc.PeerImpl"
 }
 
-task p2pConfigure(type: JavaExec) {
-    classpath sourceSets.main.runtimeClasspath
-    main = "com.p2p.configure.ConfigureNetwork"
-}
 
 test {
     useJUnitPlatform()

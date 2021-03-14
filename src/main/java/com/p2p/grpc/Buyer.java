@@ -27,6 +27,7 @@ public class Buyer extends PeerImpl{
     private static final Logger logger = Logger.getLogger(Buyer.class.getName());
     private List<PeerId> potentialSellers;
     private Server server;
+    private int hopCount;
 
     public Buyer(int id, String IPAddress, int port, int KNeighbors, Product product) {
         super(id, IPAddress, port, KNeighbors);
@@ -34,7 +35,7 @@ public class Buyer extends PeerImpl{
         this.buyItems = new ConcurrentHashMap<>();
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(2 * KNeighbors)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 1)).build();
     }
 
     public Buyer(int id, int KNeighbor){
@@ -50,7 +51,7 @@ public class Buyer extends PeerImpl{
     @Override
     public void lookup(String product, int hopCount) {
         LookUpRequest request =
-                LookUpRequest.newBuilder().setFromNode(this.getId()).setProduct(product).setHopCount(hopCount).addPath(this.getId()).build();
+                LookUpRequest.newBuilder().setBuyer(this.getId()).setProduct(product).setHopCount(hopCount).addPath(this.getId()).build();
 
         Thread[] lookupThread = new Thread[this.getNumberNeighbor()];
         int counter = 0;
@@ -145,8 +146,8 @@ public class Buyer extends PeerImpl{
         }
     }
 
-    public void run() throws IOException {
-        FileInputStream fstream = new FileInputStream("Config.txt");
+    public void run(String configFile) throws IOException {
+        FileInputStream fstream = new FileInputStream(configFile);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String strLine;
         while ((strLine = br.readLine()) != null)   {
@@ -155,7 +156,9 @@ public class Buyer extends PeerImpl{
             if (vals[0].equals("N") || vals[0].equals("K")) {
                 continue;
             }
-            if (Integer.parseInt(vals[0]) ==  this.getId()) {
+            if (vals[0].equals("hopCount")) {
+                this.hopCount = Integer.parseInt(vals[1]);
+            } else if (Integer.parseInt(vals[0]) ==  this.getId()) {
                 this.setPort(Integer.parseInt(vals[2]));
                 this.setProduct(vals[4]);
                 for (int i = 5; i < vals.length; i+=3) {
@@ -167,7 +170,7 @@ public class Buyer extends PeerImpl{
             }
         }
         this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(2 * this.getNumberNeighbor())).build();
+                ServerBuilder.forPort(this.getPort()).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor() + 1)).build();
 
         this.startServer();
 
@@ -177,19 +180,12 @@ public class Buyer extends PeerImpl{
             // buyer perform lookup
             Thread t = new Thread(() -> {
                 logger.info("Currently buying " + this.product.name());
-                this.lookup(this.product.name(), 2);
+                this.lookup(this.product.name(), this.hopCount);
 
                 try {
-                    Thread.sleep(3000); // sleep a little bit
+                    Thread.sleep(1000); // sleep a little bit
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
-                }
-
-                if (this.potentialSellers.size() > 0 ) {
-                    int index = RANDOM.nextInt(this.potentialSellers.size());
-                    PeerId seller = this.potentialSellers.get(index);
-                    this.potentialSellers.clear();
-                    this.buy(seller);
                 }
             });
             t.start();
@@ -198,6 +194,14 @@ public class Buyer extends PeerImpl{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+
+            if (this.potentialSellers.size() > 0 ) {
+                int index = RANDOM.nextInt(this.potentialSellers.size());
+                PeerId seller = this.potentialSellers.get(index);
+                this.potentialSellers.clear();
+                this.buy(seller);
+            }
+
             logger.info("Choose a new product to buy");
             this.product = Product.values()[RANDOM.nextInt(3)];
             logger.info("Now buying " + this.product.name());
@@ -209,16 +213,4 @@ public class Buyer extends PeerImpl{
         this.product = Product.valueOf(product.toUpperCase());
     }
 
-    // the main function for buyer
-    // The buyer keeps sending buy messages
-    public static void main(String[] args) {
-        // args: id port product neighborId neighborPort
-        // test case 1 and 2
-        Buyer buyer = new Buyer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        try {
-            buyer.run();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

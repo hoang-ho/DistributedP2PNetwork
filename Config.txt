@@ -1,7 +1,0 @@
-N 5
-K 4
-0 localhost 8080 buyer boar 1 localhost 8081 4 localhost 8084 
-4 localhost 8084 buyer boar 1 localhost 8081 0 localhost 8080 
-2 localhost 8082 buyer boar 1 localhost 8081 
-1 localhost 8081 peer 3 localhost 8083 0 localhost 8080 4 localhost 8084 2 localhost 8082 
-3 localhost 8083 seller boar 3 1 localhost 8081 
