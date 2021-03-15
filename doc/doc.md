@@ -395,4 +395,6 @@ For option (2), what I did is the following:
 The local lookup interface would be implemented in the Buyer. What this lookup interface would do is to send out a RPC/RMI lookup request (which includes a path parameter) from Buyer to all of its neighbors. 
 The neighbors can be a no-role peer or a buyer. What the neighbor would do when it receives the lookup request is it would return an acknowledgement for the request and further flood this lookup request via RMI/RPC lookup. 
 When the Seller receives the lookup request, it first checks whether it can reply to the lookup request. 
-If it can, it saves the path to a local variable and then calls the local reply(seller_id, buyer_id).
+If it can, it saves the path to a local variable and then calls the local reply(seller_id, buyer_id), which will further do a non-blocking reply
+
+THe pros of 

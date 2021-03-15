@@ -219,7 +219,7 @@ public class PeerImpl implements Peer{
                 this.port = Integer.parseInt(vals[2]);
                 for (int i = 4; i < vals.length; i+=3) {
                     PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
+                            PeerId.newBuilder().setIPAddress(vals[i+1]).setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
                     this.addNeighbor(neighbor);
                 }
                 break;

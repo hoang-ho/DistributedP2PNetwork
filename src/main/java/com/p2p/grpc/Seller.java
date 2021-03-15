@@ -180,7 +180,7 @@ public class Seller extends PeerImpl {
                 this.amount = stock;
                 for (int i = 6; i < vals.length; i+=3) {
                     PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress("localhost").setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
+                            PeerId.newBuilder().setIPAddress(vals[i+1]).setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
                     this.addNeighbor(neighbor);
                 }
                 break;

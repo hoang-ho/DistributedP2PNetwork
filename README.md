@@ -44,7 +44,7 @@ $ ./gradlew clean build
 Image ID for the customized EC2 instance:
 
 {
-"ImageId": "ami-01c10c86c813b4841"
+"ImageId": "ami-07916b33d72291f85"
 }
 
 ### TODO
