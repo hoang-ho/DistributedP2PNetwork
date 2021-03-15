@@ -39,7 +39,6 @@ public class PeerImpl implements Peer{
 
     public PeerImpl(int id, int KNeighbor) {
         this.id = id;
-        this.IPAddress = "localhost";
         this.neighbors = new HashMap<>();
         this.KNeighbor = KNeighbor;
     }
@@ -205,6 +204,8 @@ public class PeerImpl implements Peer{
         return this.neighbors;
     }
 
+    public void setIPAddress(String IPAddress) { this.IPAddress = IPAddress; }
+
     public String getIPAddress() { return IPAddress; }
 
     public void setPort(int port) {
@@ -222,6 +223,7 @@ public class PeerImpl implements Peer{
                 continue;
             }
             if (Integer.parseInt(vals[0]) ==  this.id) {
+                this.setIPAddress(vals[1]);
                 this.port = Integer.parseInt(vals[2]);
                 for (int i = 4; i < vals.length; i+=3) {
                     PeerId neighbor =

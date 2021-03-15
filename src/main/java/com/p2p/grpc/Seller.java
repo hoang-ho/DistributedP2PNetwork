@@ -174,6 +174,7 @@ public class Seller extends PeerImpl {
                 continue;
             }
             if (Integer.parseInt(vals[0]) ==  this.getId()) {
+                this.setIPAddress(vals[1]);
                 this.setPort(Integer.parseInt(vals[2]));
                 this.setProduct(vals[4]);
                 this.stock = Integer.parseInt(vals[5]);

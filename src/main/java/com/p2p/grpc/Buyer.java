@@ -158,6 +158,7 @@ public class Buyer extends PeerImpl{
             if (vals[0].equals("hopCount")) {
                 this.hopCount = Integer.parseInt(vals[1]);
             } else if (Integer.parseInt(vals[0]) ==  this.getId()) {
+                this.setIPAddress(vals[1]);
                 this.setPort(Integer.parseInt(vals[2]));
                 this.setProduct(vals[4]);
                 for (int i = 5; i < vals.length; i+=3) {
