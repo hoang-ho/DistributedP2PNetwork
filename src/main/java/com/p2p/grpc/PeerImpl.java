@@ -119,6 +119,12 @@ public class PeerImpl implements Peer{
             streamObserver.onCompleted();
             reverseReply(request);
         }
+
+        @Override
+        public void buyRPC(BuyRequest buyRequest, StreamObserver<Ack> streamObserver) {
+            streamObserver.onNext(Ack.newBuilder().setMessage("Empty").build());
+            streamObserver.onCompleted();
+        }
     }
 
     public void floodLookUp(LookUpRequest request) {

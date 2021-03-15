@@ -94,8 +94,9 @@ public class Buyer extends PeerImpl{
             // Wait for the server to start!
             MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
             logger.info( "Send a buy request to peer " + sellerId.getId());
-            Ack message =
-                    stub.buyRPC(BuyRequest.newBuilder().setId(Buyer.this.getId()).setProduct(Buyer.this.product.name()).build());
+            BuyRequest request =
+                    BuyRequest.newBuilder().setId(Buyer.this.getId()).setProduct(Buyer.this.product.name()).build();
+            Ack message = stub.buyRPC(request);
             if (message.getMessage().equals("Ack Sell")) {
                 buyItems.put(product, buyItems.getOrDefault(product, 0) + 1);
                 logger.info("Bought " + this.product.name() + " from peer " + sellerId.getId() + ". Buyer current has" +
