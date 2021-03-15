@@ -1,13 +1,12 @@
 package com.p2p;
 
-import com.google.gson.JsonParser;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import com.p2p.grpc.Buyer;
 import com.p2p.grpc.PeerId;
 import com.p2p.grpc.PeerImpl;
 import com.p2p.grpc.Product;
 import com.p2p.grpc.Seller;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -20,11 +19,12 @@ public class Runner {
     static final String ID = "-id";
     static final String PRODUCT = "-product";
     static final String STOCK = "-stock";
+    static final String HOP = "-hop";
 
     public static void main(String[] args) throws IOException, ParseException {
         // Read the config file and start running on EC2
         String configFile = "", role = "", id = "", product = "FISH";
-        int stock = 1;
+        int stock = 1, hop = 1;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals(CONFIG)) {
                 i++;
@@ -41,6 +41,9 @@ public class Runner {
             } else if (args[i].equals(STOCK)) {
                 i++;
                 stock = Integer.parseInt(args[i]);
+            } else if (args[i].equals(HOP)) {
+                i++;
+                hop = Integer.parseInt(args[i]);
             }
         }
 
@@ -54,6 +57,7 @@ public class Runner {
             // Create a buyer
             peer = new Buyer(Integer.parseInt(id), (String) nodeConfig.get("IPAddress"),
                     Integer.parseInt((String) nodeConfig.get("port")), neighbors.size(), Product.valueOf(product));
+            ((Buyer) peer).setHopCount(hop);
 
         } else if (role.toLowerCase().equals("seller")) {
             peer = new Seller(Integer.parseInt(id), (String) nodeConfig.get("IPAddress"),

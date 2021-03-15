@@ -3,28 +3,81 @@
 
 ### Milestone 3
 
+**Steps to run locally**
+
+Example for config files are TestCase1.json and TestCase2.json. 
+
+To run locally on your computer, for each test case with config file TestCase1.json/TestCase2.json/TestCase3.json, 
+open up N terminals (where N is the number of peers specified in each test case). In each terminal, decides which id, which role you want the node to take.
+For Buyer and Seller, you will also need to specify the product you want the peer to start with, for Seller, you will also need to specify stock and for Buyer, you will also need to specify HopCount
+
+Example:
+For **TestCase1.json**, we can specify the buyer as:
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase1.json -id 0 -role buyer -product fish -hop 1
+```
+
+and the seller as: 
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase1.json -id 1 -role seller -product fish -stock 1
+```
+
+The test script for this test case is in doc/test/TestCase1.sh, which will run 2 processes in parallel
+
+
+For **TestCase2.json**, let node 0 and 1 be the buyer and node 2 be the seller, we can specify the buyer as:
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 0 -role buyer -product fish -hop 1
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 1 -role buyer -product fish -hop 1
+```
+
+and the seller as:
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 2 -role seller -product fish -stock 1
+```
+
+The test script for this test case is in doc/test/TestCase2.sh, which will run 3 processes in parallel
+
+
+For **TestCase3.json**, let node 0, 1, 2 be the buyer, and node 3 and 4 be the no-role peer, and node 5 and 6 be the seller. 
+Open up 7 terminals and try the following: 
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 0 -role buyer -product boar -hop 4 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 1 -role buyer -product boar -hop 3
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 2 -role buyer -product fish -hop 3
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 3 -role peer 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 4 -role peer 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 5 -role seller -product boar -stock 3 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 6 -role seller -product fish -stock 3 
+```
+
+The test script for this test case is in doc/test/TestCase3.sh, which will run 7 processes in parallel
+
 Steps to run EC2
-
-For each test case, repeatedly do the following:
-
-1. Create the instance
-
-```
-aws ec2 run-instances --image-id ami-07916b33d72291f85 --instance-type t2.micro --key-name 677kp 
-```
-
-2. From the terminal output, obtain the InstanceId and PrivateIpAddress. Replace the placeholder in TestCase1.txt with corresponding PrivateIpAddress
-   
-
-```
-aws ec2 describe-instances --instance-id $InstanceId 
-```
-
-Get the instance id from the terminal output and run
-
-```
-ssh -i "677kp.pem" ec2-user@
-```
 
 
 

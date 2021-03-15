@@ -178,4 +178,5 @@ public class Buyer extends PeerImpl{
         this.product = Product.valueOf(product.toUpperCase());
     }
 
+    public void setHopCount(int hop) {this.hopCount = hop; }
 }
