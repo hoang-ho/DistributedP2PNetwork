@@ -14,18 +14,21 @@ echo "Let's start!"
 # Compile the project
 # Run the project
 
-# Start an EC2 instance
-aws ec2 run-instances --image-id ami-0fc61db8544a617ed --instance-type t2.micro --key-name 677kp > instance.json
+## Start an EC2 instance
+#aws ec2 run-instances --image-id ami-0fc61db8544a617ed --instance-type t2.micro --key-name 677kp > instance.json
+#
+## Get instance Id
+#
+#aws ec2 describe-instances --instance-id $InstanceId > runningInstance.json
+#
+#PublicDnsName=$(grep -m 1 '^ *"PublicDnsName":' runningInstance.json | awk '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
+#
+#scp -i "677kp.pem" Config.txt ec2-user@$PublicDnsName
+#
+#ssh -i "677kp.pem" ec2-user@$PublicDnsName
+#
+#./gradlew clean build
 
-# Get instance Id
 InstanceId=$(grep '^ *"InstanceId":' instance.json | awk '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
-
-aws ec2 describe-instances --instance-id $InstanceId > runningInstance.json
-
-PublicDnsName=$(grep -m 1 '^ *"PublicDnsName":' runningInstance.json | awk '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
-
-scp -i "677kp.pem" Config.txt ec2-user@$PublicDnsName
-
-ssh -i "677kp.pem" ec2-user@$PublicDnsName
-
-./gradlew clean build
+aws ec2 describe-instances --instance-id $InstanceId
+ssh -i "677kp.pem" ec2-user@ec2-54-147-62-56.compute-1.amazonaws.com

@@ -6,10 +6,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,12 +33,6 @@ public class Buyer extends PeerImpl{
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
         this.server =
                 ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 1)).build();
-    }
-
-    public Buyer(int id, int KNeighbor){
-        super(id, KNeighbor);
-        this.buyItems = new ConcurrentHashMap<>();
-        this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -145,33 +136,7 @@ public class Buyer extends PeerImpl{
         }
     }
 
-    public void run(String configFile) throws IOException {
-        FileInputStream fstream = new FileInputStream(configFile);
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-        String strLine;
-        while ((strLine = br.readLine()) != null)   {
-            // Print the content on the console
-            String[] vals = strLine.split(" ");
-            if (vals[0].equals("N") || vals[0].equals("K")) {
-                continue;
-            }
-            if (vals[0].equals("hopCount")) {
-                this.hopCount = Integer.parseInt(vals[1]);
-            } else if (Integer.parseInt(vals[0]) ==  this.getId()) {
-                this.setIPAddress(vals[1]);
-                this.setPort(Integer.parseInt(vals[2]));
-                this.setProduct(vals[4]);
-                for (int i = 5; i < vals.length; i+=3) {
-                    PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress(vals[i+1]).setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
-                    this.addNeighbor(neighbor);
-                }
-                break;
-            }
-        }
-        this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor() + 1)).build();
-
+    public void run() {
         this.startServer();
 
         // buyer keeps buying products forever

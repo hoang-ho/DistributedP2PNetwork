@@ -1,5 +1,33 @@
 ## How to make sure the test is correct?
 
+
+### Milestone 3
+
+Steps to run EC2
+
+For each test case, repeatedly do the following:
+
+1. Create the instance
+
+```
+aws ec2 run-instances --image-id ami-07916b33d72291f85 --instance-type t2.micro --key-name 677kp 
+```
+
+2. From the terminal output, obtain the InstanceId and PrivateIpAddress. Replace the placeholder in TestCase1.txt with corresponding PrivateIpAddress
+   
+
+```
+aws ec2 describe-instances --instance-id $InstanceId 
+```
+
+Get the instance id from the terminal output and run
+
+```
+ssh -i "677kp.pem" ec2-user@
+```
+
+
+
 ### Milestone 2
 
 First build the script with:

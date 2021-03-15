@@ -6,10 +6,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,13 +35,9 @@ public class Seller extends PeerImpl {
         this.stock = amount;
         this.replyPath = new ConcurrentHashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 1)).build();
     }
 
-    public Seller(int id, int KNeighbors) {
-        super(id, KNeighbors);
-        this.replyPath = new ConcurrentHashMap<>();
-    }
 
     /**
      * Reply request from Seller to Buyer
@@ -163,33 +156,7 @@ public class Seller extends PeerImpl {
         this.product = Product.valueOf(product.toUpperCase());
     }
 
-    public void run(String configFile) throws IOException {
-        FileInputStream fstream = new FileInputStream(configFile);
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-        String strLine;
-        while ((strLine = br.readLine()) != null)   {
-            // Print the content on the console
-            String[] vals = strLine.split(" ");
-            if (vals[0].equals("N") || vals[0].equals("K") || vals[0].equals("hopCount")) {
-                continue;
-            }
-            if (Integer.parseInt(vals[0]) ==  this.getId()) {
-                this.setIPAddress(vals[1]);
-                this.setPort(Integer.parseInt(vals[2]));
-                this.setProduct(vals[4]);
-                this.stock = Integer.parseInt(vals[5]);
-                this.amount = stock;
-                for (int i = 6; i < vals.length; i+=3) {
-                    PeerId neighbor =
-                            PeerId.newBuilder().setIPAddress(vals[i+1]).setId(Integer.parseInt(vals[i])).setPort(Integer.parseInt(vals[i+2])).build();
-                    this.addNeighbor(neighbor);
-                }
-                break;
-            }
-        }
-        this.server =
-                ServerBuilder.forPort(this.getPort()).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(this.getNumberNeighbor())).build();
-
+    public void run() {
         this.startServer();
         this.blockUntilShutdown();
     }

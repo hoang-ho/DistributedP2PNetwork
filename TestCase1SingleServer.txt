@@ -1,5 +1,0 @@
-N 2
-K 1
-hopCount 1
-0 localhost 8080 buyer boar 1 localhost 8081
-1 localhost 8081 seller boar 1 0 localhost 8080

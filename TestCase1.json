@@ -1,0 +1,22 @@
+{
+  "N": "2",
+  "K": "1",
+  "network": [
+    {
+      "id": "0",
+      "IPAddress": "localhost",
+      "port": "8080",
+      "neighbors": [
+        "1"
+      ]
+    },
+    {
+      "id": "1",
+      "IPAddress": "localhost",
+      "port": "8081",
+      "neighbors": [
+        "0"
+      ]
+    }
+  ]
+}
