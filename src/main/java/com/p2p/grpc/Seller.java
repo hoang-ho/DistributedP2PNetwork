@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.Logger;
 
 /**
@@ -25,7 +27,7 @@ public class Seller extends PeerImpl {
     private int stock;
     private Server server;
     private static Random RANDOM = new Random(0);
-    private Map<Integer, List<Integer>> replyPath;
+    private Map<Integer, BlockingDeque<List<Integer>>> replyPath;
 
     private static final Logger logger = Logger.getLogger(Seller.class.getName());
     public Seller(int id, String IPAddress, int port, int KNeighbors, Product product, int amount) {
@@ -35,7 +37,7 @@ public class Seller extends PeerImpl {
         this.stock = amount;
         this.replyPath = new ConcurrentHashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 1)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 2)).build();
     }
 
 
@@ -44,7 +46,7 @@ public class Seller extends PeerImpl {
      * */
     @Override
     public void reply(int buyerId, PeerId seller) {
-        List<Integer> path = replyPath.get(buyerId);
+        List<Integer> path = replyPath.get(buyerId).pollFirst();
         int previousNodeId = path.remove(path.size() - 1);
         PeerId previousNode = this.getNeighbor(previousNodeId);
         ManagedChannel channel = ManagedChannelBuilder.forAddress(previousNode.getIPAddress(), previousNode.getPort()).usePlaintext().build();
@@ -57,7 +59,6 @@ public class Seller extends PeerImpl {
         stub.replyRPC(replyRequest);
         channel.shutdown();
         logger.info("Done Reply");
-        replyPath.remove(buyerId);
     }
 
     /**
@@ -82,7 +83,15 @@ public class Seller extends PeerImpl {
             // if the seller is selling the product
             if (request.getProduct().equals(product.name())) {
                 logger.info("Reply to lookup request from peer " + request.getBuyer() + " for product " + request.getProduct());
-                replyPath.put(request.getBuyer(), new ArrayList<>(request.getPathList()));
+                synchronized (this) {
+                    if (replyPath.containsKey(request.getBuyer())) {
+                        replyPath.get(request.getBuyer()).addLast(new ArrayList<>(request.getPathList()));
+                    } else {
+                        replyPath.put(request.getBuyer(), new LinkedBlockingDeque<>());
+                        replyPath.get(request.getBuyer()).addLast(new ArrayList<>(request.getPathList()));
+                    }
+                }
+
                 PeerId seller =
                         PeerId.newBuilder().setId(Seller.this.getId()).setIPAddress(Seller.this.getIPAddress()).setPort(Seller.this.getPort()).build();
                 Seller.this.reply(request.getBuyer(), seller);

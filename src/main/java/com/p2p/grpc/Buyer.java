@@ -32,7 +32,7 @@ public class Buyer extends PeerImpl{
         this.buyItems = new ConcurrentHashMap<>();
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 1)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 2)).build();
     }
 
     /**
@@ -137,6 +137,7 @@ public class Buyer extends PeerImpl{
     }
 
     public void run() {
+        logger.info("All neighbors of ours" + this.getAllNeighbors());
         this.startServer();
 
         // buyer keeps buying products forever

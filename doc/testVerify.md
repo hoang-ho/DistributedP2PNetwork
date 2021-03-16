@@ -1,9 +1,10 @@
-## How to make sure the test is correct?
+# Testing Proces
 
 
-### Milestone 3
+## Milestone 3
 
-**Steps to run locally**
+
+### Steps to run locally
 
 Example for config files are TestCase1.json and TestCase2.json. 
 
@@ -48,37 +49,102 @@ For **TestCase3.json**, let node 0, 1, 2 be the buyer, and node 3 and 4 be the n
 Open up 7 terminals and try the following: 
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 0 -role buyer -product boar -hop 4 
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 0 -role buyer -product boar -hop 4 
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 1 -role buyer -product boar -hop 3
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 1 -role buyer -product boar -hop 3
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 2 -role buyer -product fish -hop 3
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 2 -role buyer -product fish -hop 3
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 3 -role peer 
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 3 -role peer 
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 4 -role peer 
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 4 -role peer 
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 5 -role seller -product boar -stock 3 
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 5 -role seller -product boar -stock 3 
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 6 -role seller -product fish -stock 3 
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json -id 6 -role seller -product fish -stock 3 
 ```
 
 The test script for this test case is in doc/test/TestCase3.sh, which will run 7 processes in parallel
 
-Steps to run EC2
+### Steps to run on EC2 cluster. 
 
+1. Make sure you have key pair, here I use 677kp. Creates N EC2 instances using the following image: ami-07916b33d72291f85 
+
+```
+$ aws ec2 run-instances --image-id ami-07916b33d72291f85 --instance-type t2.micro --key-name 677kp
+```
+
+2. Save the PrivateIpAddress for each peer. You can find this from the terminal output of the above command, or from sudo ifconfig when you already ssh into the EC2 instance
+
+3. Put the PrivateIpAddress of each peer as the IPAddress in the config file. Remember that if you put PrivateIpAddress of one instance as IPAddress for a peer, you later must call that peer with the same id, 
+   e.g. if you put IPAddress for peer 0 as "172.31.55.0", then later in the instance with that PrivateIpAddress, you need to specify the "-id 0"
+    
+4. After you replace all IPAddress, move the config file into each instance with scp
+
+```
+$ scp -i "677kp.pem" TestCase3.json ec2-user@$PublicDnsName:~/CompSci677-Lab1
+```
+
+Where $PublicDnsName is the Public DNS name of your instance, obtained from running: ```aws ec2 describe-instances --instance-id $INSTANCEID```
+
+5. ssh into your instance:
+
+```
+$ ssh -i "677kp.pem" ec2-user@$PublicDnsName
+```
+
+6. Go to the directory
+
+```
+$ cd CompSci677-Lab1
+```
+
+7. Start the test. For the instance which you use the PrivateIpAddress for peer $ID, you need to specify that ID again when running the jar file. 
+For example, I use "172.31.45.247" for peer 0, later in the instance with PrivateIpAddress "172.31.45.247", I ran:
+   
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 0 -role buyer -product boar -hop 4 
+```
+
+For other peers in other EC2 instance, run the corresponding command:
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 1 -role buyer -product boar -hop 3
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 2 -role buyer -product fish -hop 3
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 3 -role peer 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 4 -role peer 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 5 -role seller -product boar -stock 3 
+```
+
+```
+java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 6 -role seller -product fish -stock 3 
+```
+
+Feel free to let the peer running for 1-2 minutes to see the how process in action!
 
 
 ### Milestone 2

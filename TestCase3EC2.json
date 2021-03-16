@@ -4,7 +4,7 @@
   "network": [
     {
       "id": "0",
-      "IPAddress": "localhost",
+      "IPAddress": "172.31.45.247",
       "port": "8080",
       "neighbors": [
         "3",
@@ -13,8 +13,8 @@
     },
     {
       "id": "1",
-      "IPAddress": "localhost",
-      "port": "8081",
+      "IPAddress": "172.31.91.178",
+      "port": "8080",
       "neighbors": [
         "0",
         "2",
@@ -23,8 +23,8 @@
     },
     {
       "id": "2",
-      "IPAddress": "localhost",
-      "port": "8082",
+      "IPAddress": "172.31.88.28",
+      "port": "8080",
       "neighbors": [
         "1",
         "4"
@@ -32,8 +32,8 @@
     },
     {
       "id": "3",
-      "IPAddress": "localhost",
-      "port": "8083",
+      "IPAddress": "172.31.55.0",
+      "port": "8080",
       "neighbors": [
         "0",
         "1",
@@ -42,8 +42,8 @@
     },
     {
       "id": "4",
-      "IPAddress": "localhost",
-      "port": "8084",
+      "IPAddress": "172.31.18.128",
+      "port": "8080",
       "neighbors": [
         "2",
         "6"
@@ -51,8 +51,8 @@
     },
     {
       "id": "5",
-      "IPAddress": "localhost",
-      "port": "8085",
+      "IPAddress": "172.31.85.180",
+      "port": "8080",
       "neighbors": [
         "3",
         "6"
@@ -60,8 +60,8 @@
     },
     {
       "id": "6",
-      "IPAddress": "localhost",
-      "port": "8086",
+      "IPAddress": "172.31.95.38",
+      "port": "8080",
       "neighbors": [
         "4",
         "5"

@@ -31,7 +31,7 @@ public class PeerImpl implements Peer{
         this.KNeighbor = KNeighbor;
         this.neighbors = new HashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 1)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 2)).build();
     }
 
     /**
@@ -153,6 +153,8 @@ public class PeerImpl implements Peer{
 
     public void reverseReply(ReplyRequest request) {
         List<Integer> path = new ArrayList<>(request.getPathList());
+        logger.info("PAth: " + path);
+        logger.info("All our neighbors" + getAllNeighbors());
         PeerId fromNode = neighbors.get(path.remove(path.size() - 1));
         PeerId seller = request.getSellerId();
 
