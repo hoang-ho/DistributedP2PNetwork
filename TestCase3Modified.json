@@ -1,0 +1,73 @@
+{
+  "N": "7",
+  "K": "4",
+  "network": [
+    {
+      "id": "0",
+      "IPAddress": "localhost",
+      "port": "8080",
+      "neighbors": [
+        "3",
+        "1"
+      ]
+    },
+    {
+      "id": "1",
+      "IPAddress": "localhost",
+      "port": "8081",
+      "neighbors": [
+        "0",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "id": "2",
+      "IPAddress": "localhost",
+      "port": "8082",
+      "neighbors": [
+        "1",
+        "3",
+        "4"
+      ]
+    },
+    {
+      "id": "3",
+      "IPAddress": "localhost",
+      "port": "8083",
+      "neighbors": [
+        "0",
+        "1",
+        "2",
+        "5"
+      ]
+    },
+    {
+      "id": "4",
+      "IPAddress": "localhost",
+      "port": "8084",
+      "neighbors": [
+        "2",
+        "6"
+      ]
+    },
+    {
+      "id": "5",
+      "IPAddress": "localhost",
+      "port": "8085",
+      "neighbors": [
+        "3",
+        "6"
+      ]
+    },
+    {
+      "id": "6",
+      "IPAddress": "localhost",
+      "port": "8086",
+      "neighbors": [
+        "4",
+        "5"
+      ]
+    }
+  ]
+}

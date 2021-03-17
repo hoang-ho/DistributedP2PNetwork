@@ -1,0 +1,2390 @@
+409 milliseconds
+
+413 milliseconds
+
+742 milliseconds
+
+194 milliseconds
+
+243 milliseconds
+
+256 milliseconds
+
+137 milliseconds
+
+184 milliseconds
+
+281 milliseconds
+
+336 milliseconds
+
+336 milliseconds
+
+346 milliseconds
+
+347 milliseconds
+
+416 milliseconds
+
+100 milliseconds
+
+151 milliseconds
+
+152 milliseconds
+
+87 milliseconds
+
+113 milliseconds
+
+129 milliseconds
+
+50 milliseconds
+
+69 milliseconds
+
+79 milliseconds
+
+63 milliseconds
+
+81 milliseconds
+
+91 milliseconds
+
+53 milliseconds
+
+89 milliseconds
+
+94 milliseconds
+
+97 milliseconds
+
+103 milliseconds
+
+110 milliseconds
+
+46 milliseconds
+
+60 milliseconds
+
+63 milliseconds
+
+76 milliseconds
+
+91 milliseconds
+
+108 milliseconds
+
+50 milliseconds
+
+68 milliseconds
+
+73 milliseconds
+
+80 milliseconds
+
+43 milliseconds
+
+59 milliseconds
+
+65 milliseconds
+
+74 milliseconds
+
+61 milliseconds
+
+66 milliseconds
+
+76 milliseconds
+
+95 milliseconds
+
+100 milliseconds
+
+56 milliseconds
+
+57 milliseconds
+
+41 milliseconds
+
+52 milliseconds
+
+57 milliseconds
+
+58 milliseconds
+
+65 milliseconds
+
+75 milliseconds
+
+76 milliseconds
+
+60 milliseconds
+
+85 milliseconds
+
+90 milliseconds
+
+96 milliseconds
+
+43 milliseconds
+
+57 milliseconds
+
+64 milliseconds
+
+72 milliseconds
+
+39 milliseconds
+
+60 milliseconds
+
+70 milliseconds
+
+75 milliseconds
+
+81 milliseconds
+
+82 milliseconds
+
+90 milliseconds
+
+94 milliseconds
+
+59 milliseconds
+
+62 milliseconds
+
+45 milliseconds
+
+64 milliseconds
+
+76 milliseconds
+
+35 milliseconds
+
+47 milliseconds
+
+51 milliseconds
+
+91 milliseconds
+
+99 milliseconds
+
+106 milliseconds
+
+118 milliseconds
+
+33 milliseconds
+
+43 milliseconds
+
+50 milliseconds
+
+54 milliseconds
+
+42 milliseconds
+
+49 milliseconds
+
+72 milliseconds
+
+80 milliseconds
+
+56 milliseconds
+
+62 milliseconds
+
+57 milliseconds
+
+68 milliseconds
+
+74 milliseconds
+
+58 milliseconds
+
+81 milliseconds
+
+90 milliseconds
+
+72 milliseconds
+
+91 milliseconds
+
+102 milliseconds
+
+53 milliseconds
+
+68 milliseconds
+
+72 milliseconds
+
+33 milliseconds
+
+62 milliseconds
+
+67 milliseconds
+
+50 milliseconds
+
+67 milliseconds
+
+69 milliseconds
+
+49 milliseconds
+
+61 milliseconds
+
+74 milliseconds
+
+83 milliseconds
+
+62 milliseconds
+
+92 milliseconds
+
+95 milliseconds
+
+103 milliseconds
+
+41 milliseconds
+
+48 milliseconds
+
+51 milliseconds
+
+54 milliseconds
+
+158 milliseconds
+
+169 milliseconds
+
+186 milliseconds
+
+207 milliseconds
+
+48 milliseconds
+
+79 milliseconds
+
+79 milliseconds
+
+90 milliseconds
+
+32 milliseconds
+
+44 milliseconds
+
+77 milliseconds
+
+73 milliseconds
+
+74 milliseconds
+
+60 milliseconds
+
+62 milliseconds
+
+61 milliseconds
+
+114 milliseconds
+
+30 milliseconds
+
+48 milliseconds
+
+48 milliseconds
+
+48 milliseconds
+
+31 milliseconds
+
+53 milliseconds
+
+53 milliseconds
+
+55 milliseconds
+
+32 milliseconds
+
+49 milliseconds
+
+51 milliseconds
+
+80 milliseconds
+
+101 milliseconds
+
+140 milliseconds
+
+143 milliseconds
+
+144 milliseconds
+
+46 milliseconds
+
+46 milliseconds
+
+35 milliseconds
+
+48 milliseconds
+
+48 milliseconds
+
+36 milliseconds
+
+53 milliseconds
+
+53 milliseconds
+
+53 milliseconds
+
+55 milliseconds
+
+61 milliseconds
+
+37 milliseconds
+
+45 milliseconds
+
+24 milliseconds
+
+34 milliseconds
+
+44 milliseconds
+
+32 milliseconds
+
+39 milliseconds
+
+43 milliseconds
+
+198 milliseconds
+
+228 milliseconds
+
+228 milliseconds
+
+36 milliseconds
+
+42 milliseconds
+
+49 milliseconds
+
+53 milliseconds
+
+57 milliseconds
+
+67 milliseconds
+
+69 milliseconds
+
+72 milliseconds
+
+49 milliseconds
+
+58 milliseconds
+
+62 milliseconds
+
+73 milliseconds
+
+47 milliseconds
+
+59 milliseconds
+
+69 milliseconds
+
+71 milliseconds
+
+197 milliseconds
+
+200 milliseconds
+
+239 milliseconds
+
+281 milliseconds
+
+346 milliseconds
+
+388 milliseconds
+
+26 milliseconds
+
+59 milliseconds
+
+62 milliseconds
+
+66 milliseconds
+
+47 milliseconds
+
+58 milliseconds
+
+60 milliseconds
+
+64 milliseconds
+
+33 milliseconds
+
+41 milliseconds
+
+47 milliseconds
+
+68 milliseconds
+
+26 milliseconds
+
+54 milliseconds
+
+58 milliseconds
+
+59 milliseconds
+
+63 milliseconds
+
+95 milliseconds
+
+108 milliseconds
+
+52 milliseconds
+
+59 milliseconds
+
+62 milliseconds
+
+22 milliseconds
+
+57 milliseconds
+
+59 milliseconds
+
+35 milliseconds
+
+38 milliseconds
+
+18 milliseconds
+
+27 milliseconds
+
+27 milliseconds
+
+26 milliseconds
+
+33 milliseconds
+
+41 milliseconds
+
+45 milliseconds
+
+57 milliseconds
+
+59 milliseconds
+
+55 milliseconds
+
+112 milliseconds
+
+119 milliseconds
+
+33 milliseconds
+
+44 milliseconds
+
+45 milliseconds
+
+28 milliseconds
+
+60 milliseconds
+
+65 milliseconds
+
+97 milliseconds
+
+100 milliseconds
+
+109 milliseconds
+
+113 milliseconds
+
+74 milliseconds
+
+82 milliseconds
+
+91 milliseconds
+
+95 milliseconds
+
+21 milliseconds
+
+61 milliseconds
+
+64 milliseconds
+
+66 milliseconds
+
+127 milliseconds
+
+141 milliseconds
+
+177 milliseconds
+
+84 milliseconds
+
+86 milliseconds
+
+53 milliseconds
+
+55 milliseconds
+
+69 milliseconds
+
+99 milliseconds
+
+60 milliseconds
+
+70 milliseconds
+
+73 milliseconds
+
+50 milliseconds
+
+56 milliseconds
+
+58 milliseconds
+
+79 milliseconds
+
+60 milliseconds
+
+67 milliseconds
+
+54 milliseconds
+
+54 milliseconds
+
+39 milliseconds
+
+43 milliseconds
+
+30 milliseconds
+
+39 milliseconds
+
+43 milliseconds
+
+43 milliseconds
+
+26 milliseconds
+
+29 milliseconds
+
+55 milliseconds
+
+77 milliseconds
+
+131 milliseconds
+
+30 milliseconds
+
+56 milliseconds
+
+58 milliseconds
+
+38 milliseconds
+
+47 milliseconds
+
+51 milliseconds
+
+74 milliseconds
+
+76 milliseconds
+
+80 milliseconds
+
+53 milliseconds
+
+62 milliseconds
+
+103 milliseconds
+
+140 milliseconds
+
+150 milliseconds
+
+153 milliseconds
+
+65 milliseconds
+
+73 milliseconds
+
+77 milliseconds
+
+53 milliseconds
+
+67 milliseconds
+
+104 milliseconds
+
+78 milliseconds
+
+88 milliseconds
+
+128 milliseconds
+
+46 milliseconds
+
+48 milliseconds
+
+36 milliseconds
+
+38 milliseconds
+
+47 milliseconds
+
+49 milliseconds
+
+24 milliseconds
+
+24 milliseconds
+
+46 milliseconds
+
+48 milliseconds
+
+26 milliseconds
+
+34 milliseconds
+
+36 milliseconds
+
+25 milliseconds
+
+30 milliseconds
+
+66 milliseconds
+
+77 milliseconds
+
+17 milliseconds
+
+25 milliseconds
+
+27 milliseconds
+
+40 milliseconds
+
+46 milliseconds
+
+20 milliseconds
+
+27 milliseconds
+
+29 milliseconds
+
+33 milliseconds
+
+38 milliseconds
+
+39 milliseconds
+
+19 milliseconds
+
+30 milliseconds
+
+30 milliseconds
+
+31 milliseconds
+
+34 milliseconds
+
+38 milliseconds
+
+16 milliseconds
+
+23 milliseconds
+
+24 milliseconds
+
+56 milliseconds
+
+70 milliseconds
+
+27 milliseconds
+
+29 milliseconds
+
+24 milliseconds
+
+26 milliseconds
+
+23 milliseconds
+
+30 milliseconds
+
+32 milliseconds
+
+35 milliseconds
+
+29 milliseconds
+
+47 milliseconds
+
+50 milliseconds
+
+52 milliseconds
+
+23 milliseconds
+
+26 milliseconds
+
+30 milliseconds
+
+37 milliseconds
+
+52 milliseconds
+
+57 milliseconds
+
+39 milliseconds
+
+45 milliseconds
+
+50 milliseconds
+
+55 milliseconds
+
+49 milliseconds
+
+56 milliseconds
+
+86 milliseconds
+
+96 milliseconds
+
+20 milliseconds
+
+32 milliseconds
+
+51 milliseconds
+
+52 milliseconds
+
+21 milliseconds
+
+28 milliseconds
+
+30 milliseconds
+
+34 milliseconds
+
+36 milliseconds
+
+39 milliseconds
+
+41 milliseconds
+
+46 milliseconds
+
+29 milliseconds
+
+36 milliseconds
+
+39 milliseconds
+
+44 milliseconds
+
+36 milliseconds
+
+36 milliseconds
+
+25 milliseconds
+
+30 milliseconds
+
+52 milliseconds
+
+48 milliseconds
+
+58 milliseconds
+
+59 milliseconds
+
+27 milliseconds
+
+35 milliseconds
+
+45 milliseconds
+
+31 milliseconds
+
+32 milliseconds
+
+55 milliseconds
+
+60 milliseconds
+
+65 milliseconds
+
+83 milliseconds
+
+35 milliseconds
+
+52 milliseconds
+
+56 milliseconds
+
+58 milliseconds
+
+64 milliseconds
+
+66 milliseconds
+
+73 milliseconds
+
+78 milliseconds
+
+55 milliseconds
+
+61 milliseconds
+
+62 milliseconds
+
+167 milliseconds
+
+168 milliseconds
+
+37 milliseconds
+
+49 milliseconds
+
+38 milliseconds
+
+38 milliseconds
+
+22 milliseconds
+
+27 milliseconds
+
+31 milliseconds
+
+220 milliseconds
+
+263 milliseconds
+
+334 milliseconds
+
+98 milliseconds
+
+114 milliseconds
+
+140 milliseconds
+
+144 milliseconds
+
+19 milliseconds
+
+22 milliseconds
+
+29 milliseconds
+
+35 milliseconds
+
+42 milliseconds
+
+51 milliseconds
+
+22 milliseconds
+
+33 milliseconds
+
+38 milliseconds
+
+26 milliseconds
+
+31 milliseconds
+
+33 milliseconds
+
+27 milliseconds
+
+30 milliseconds
+
+45 milliseconds
+
+53 milliseconds
+
+55 milliseconds
+
+18 milliseconds
+
+20 milliseconds
+
+17 milliseconds
+
+24 milliseconds
+
+97 milliseconds
+
+27 milliseconds
+
+34 milliseconds
+
+35 milliseconds
+
+40 milliseconds
+
+46 milliseconds
+
+51 milliseconds
+
+83 milliseconds
+
+66 milliseconds
+
+69 milliseconds
+
+50 milliseconds
+
+52 milliseconds
+
+31 milliseconds
+
+36 milliseconds
+
+39 milliseconds
+
+57 milliseconds
+
+66 milliseconds
+
+74 milliseconds
+
+27 milliseconds
+
+29 milliseconds
+
+35 milliseconds
+
+38 milliseconds
+
+59 milliseconds
+
+66 milliseconds
+
+40 milliseconds
+
+42 milliseconds
+
+17 milliseconds
+
+23 milliseconds
+
+26 milliseconds
+
+27 milliseconds
+
+59 milliseconds
+
+63 milliseconds
+
+65 milliseconds
+
+66 milliseconds
+
+26 milliseconds
+
+31 milliseconds
+
+34 milliseconds
+
+34 milliseconds
+
+35 milliseconds
+
+64 milliseconds
+
+76 milliseconds
+
+85 milliseconds
+
+28 milliseconds
+
+45 milliseconds
+
+45 milliseconds
+
+37 milliseconds
+
+43 milliseconds
+
+38 milliseconds
+
+60 milliseconds
+
+61 milliseconds
+
+63 milliseconds
+
+48 milliseconds
+
+80 milliseconds
+
+80 milliseconds
+
+81 milliseconds
+
+19 milliseconds
+
+25 milliseconds
+
+26 milliseconds
+
+69 milliseconds
+
+70 milliseconds
+
+38 milliseconds
+
+48 milliseconds
+
+48 milliseconds
+
+49 milliseconds
+
+35 milliseconds
+
+61 milliseconds
+
+64 milliseconds
+
+64 milliseconds
+
+25 milliseconds
+
+30 milliseconds
+
+33 milliseconds
+
+35 milliseconds
+
+37 milliseconds
+
+38 milliseconds
+
+50 milliseconds
+
+51 milliseconds
+
+62 milliseconds
+
+100 milliseconds
+
+61 milliseconds
+
+66 milliseconds
+
+108 milliseconds
+
+116 milliseconds
+
+92 milliseconds
+
+135 milliseconds
+
+136 milliseconds
+
+138 milliseconds
+
+29 milliseconds
+
+29 milliseconds
+
+20 milliseconds
+
+31 milliseconds
+
+25 milliseconds
+
+25 milliseconds
+
+23 milliseconds
+
+31 milliseconds
+
+41 milliseconds
+
+42 milliseconds
+
+29 milliseconds
+
+57 milliseconds
+
+57 milliseconds
+
+59 milliseconds
+
+20 milliseconds
+
+27 milliseconds
+
+28 milliseconds
+
+28 milliseconds
+
+120 milliseconds
+
+121 milliseconds
+
+35 milliseconds
+
+88 milliseconds
+
+91 milliseconds
+
+53 milliseconds
+
+97 milliseconds
+
+98 milliseconds
+
+100 milliseconds
+
+30 milliseconds
+
+52 milliseconds
+
+53 milliseconds
+
+22 milliseconds
+
+23 milliseconds
+
+37 milliseconds
+
+42 milliseconds
+
+43 milliseconds
+
+22 milliseconds
+
+28 milliseconds
+
+31 milliseconds
+
+14 milliseconds
+
+19 milliseconds
+
+21 milliseconds
+
+120 milliseconds
+
+155 milliseconds
+
+160 milliseconds
+
+250 milliseconds
+
+42 milliseconds
+
+47 milliseconds
+
+51 milliseconds
+
+58 milliseconds
+
+70 milliseconds
+
+78 milliseconds
+
+79 milliseconds
+
+50 milliseconds
+
+51 milliseconds
+
+28 milliseconds
+
+29 milliseconds
+
+58 milliseconds
+
+60 milliseconds
+
+17 milliseconds
+
+23 milliseconds
+
+25 milliseconds
+
+15 milliseconds
+
+32 milliseconds
+
+34 milliseconds
+
+27 milliseconds
+
+34 milliseconds
+
+36 milliseconds
+
+16 milliseconds
+
+33 milliseconds
+
+52 milliseconds
+
+59 milliseconds
+
+66 milliseconds
+
+69 milliseconds
+
+21 milliseconds
+
+27 milliseconds
+
+28 milliseconds
+
+17 milliseconds
+
+22 milliseconds
+
+23 milliseconds
+
+21 milliseconds
+
+24 milliseconds
+
+28 milliseconds
+
+33 milliseconds
+
+18 milliseconds
+
+20 milliseconds
+
+22 milliseconds
+
+22 milliseconds
+
+42 milliseconds
+
+44 milliseconds
+
+24 milliseconds
+
+27 milliseconds
+
+32 milliseconds
+
+77 milliseconds
+
+32 milliseconds
+
+34 milliseconds
+
+44 milliseconds
+
+47 milliseconds
+
+18 milliseconds
+
+24 milliseconds
+
+26 milliseconds
+
+28 milliseconds
+
+33 milliseconds
+
+54 milliseconds
+
+62 milliseconds
+
+67 milliseconds
+
+20 milliseconds
+
+33 milliseconds
+
+38 milliseconds
+
+41 milliseconds
+
+25 milliseconds
+
+27 milliseconds
+
+30 milliseconds
+
+31 milliseconds
+
+22 milliseconds
+
+36 milliseconds
+
+48 milliseconds
+
+56 milliseconds
+
+19 milliseconds
+
+20 milliseconds
+
+21 milliseconds
+
+24 milliseconds
+
+19 milliseconds
+
+19 milliseconds
+
+205 milliseconds
+
+258 milliseconds
+
+15 milliseconds
+
+16 milliseconds
+
+67 milliseconds
+
+73 milliseconds
+
+75 milliseconds
+
+42 milliseconds
+
+43 milliseconds
+
+92 milliseconds
+
+94 milliseconds
+
+42 milliseconds
+
+45 milliseconds
+
+49 milliseconds
+
+54 milliseconds
+
+23 milliseconds
+
+48 milliseconds
+
+51 milliseconds
+
+54 milliseconds
+
+25 milliseconds
+
+28 milliseconds
+
+28 milliseconds
+
+29 milliseconds
+
+20 milliseconds
+
+24 milliseconds
+
+24 milliseconds
+
+29 milliseconds
+
+52 milliseconds
+
+54 milliseconds
+
+34 milliseconds
+
+34 milliseconds
+
+18 milliseconds
+
+53 milliseconds
+
+29 milliseconds
+
+31 milliseconds
+
+31 milliseconds
+
+33 milliseconds
+
+42 milliseconds
+
+43 milliseconds
+
+24 milliseconds
+
+24 milliseconds
+
+28 milliseconds
+
+28 milliseconds
+
+15 milliseconds
+
+21 milliseconds
+
+21 milliseconds
+
+22 milliseconds
+
+22 milliseconds
+
+33 milliseconds
+
+35 milliseconds
+
+35 milliseconds
+
+27 milliseconds
+
+30 milliseconds
+
+31 milliseconds
+
+32 milliseconds
+
+37 milliseconds
+
+40 milliseconds
+
+71 milliseconds
+
+74 milliseconds
+
+22 milliseconds
+
+27 milliseconds
+
+55 milliseconds
+
+58 milliseconds
+
+41 milliseconds
+
+46 milliseconds
+
+48 milliseconds
+
+53 milliseconds
+
+55 milliseconds
+
+83 milliseconds
+
+18 milliseconds
+
+24 milliseconds
+
+26 milliseconds
+
+28 milliseconds
+
+29 milliseconds
+
+30 milliseconds
+
+21 milliseconds
+
+25 milliseconds
+
+45 milliseconds
+
+48 milliseconds
+
+113 milliseconds
+
+120 milliseconds
+
+169 milliseconds
+
+213 milliseconds
+
+38 milliseconds
+
+41 milliseconds
+
+50 milliseconds
+
+92 milliseconds
+
+41 milliseconds
+
+43 milliseconds
+
+49 milliseconds
+
+52 milliseconds
+
+23 milliseconds
+
+53 milliseconds
+
+57 milliseconds
+
+272 milliseconds
+
+276 milliseconds
+
+245 milliseconds
+
+23 milliseconds
+
+25 milliseconds
+
+15 milliseconds
+
+54 milliseconds
+
+57 milliseconds
+
+40 milliseconds
+
+45 milliseconds
+
+56 milliseconds
+
+89 milliseconds
+
+45 milliseconds
+
+51 milliseconds
+
+17 milliseconds
+
+17 milliseconds
+
+23 milliseconds
+
+66 milliseconds
+
+68 milliseconds
+
+53 milliseconds
+
+54 milliseconds
+
+21 milliseconds
+
+25 milliseconds
+
+28 milliseconds
+
+31 milliseconds
+
+73 milliseconds
+
+77 milliseconds
+
+80 milliseconds
+
+46 milliseconds
+
+50 milliseconds
+
+54 milliseconds
+
+59 milliseconds
+
+26 milliseconds
+
+30 milliseconds
+
+35 milliseconds
+
+40 milliseconds
+
+36 milliseconds
+
+63 milliseconds
+
+47 milliseconds
+
+50 milliseconds
+
+51 milliseconds
+
+299 milliseconds
+
+304 milliseconds
+
+324 milliseconds
+
+64 milliseconds
+
+65 milliseconds
+
+41 milliseconds
+
+46 milliseconds
+
+49 milliseconds
+
+28 milliseconds
+
+36 milliseconds
+
+37 milliseconds
+
+22 milliseconds
+
+24 milliseconds
+
+62 milliseconds
+
+73 milliseconds
+
+53 milliseconds
+
+56 milliseconds
+
+61 milliseconds
+
+62 milliseconds
+
+34 milliseconds
+
+37 milliseconds
+
+42 milliseconds
+
+44 milliseconds
+
+17 milliseconds
+
+31 milliseconds
+
+33 milliseconds
+
+34 milliseconds
+
+151 milliseconds
+
+154 milliseconds
+
+24 milliseconds
+
+30 milliseconds
+
+31 milliseconds
+
+30 milliseconds
+
+67 milliseconds
+
+70 milliseconds
+
+35 milliseconds
+
+44 milliseconds
+
+15 milliseconds
+
+20 milliseconds
+
+22 milliseconds
+
+45 milliseconds
+
+46 milliseconds
+
+35 milliseconds
+
+41 milliseconds
+
+44 milliseconds
+
+35 milliseconds
+
+39 milliseconds
+
+46 milliseconds
+
+77 milliseconds
+
+17 milliseconds
+
+24 milliseconds
+
+29 milliseconds
+
+62 milliseconds
+
+41 milliseconds
+
+43 milliseconds
+
+24 milliseconds
+
+27 milliseconds
+
+21 milliseconds
+
+45 milliseconds
+
+30 milliseconds
+
+31 milliseconds
+
+38 milliseconds
+
+39 milliseconds
+
+38 milliseconds
+
+41 milliseconds
+
+47 milliseconds
+
+50 milliseconds
+
+33 milliseconds
+
+37 milliseconds
+
+40 milliseconds
+
+42 milliseconds
+
+39 milliseconds
+
+47 milliseconds
+
+49 milliseconds
+
+25 milliseconds
+
+33 milliseconds
+
+38 milliseconds
+
+226 milliseconds
+
+269 milliseconds
+
+313 milliseconds
+
+53 milliseconds
+
+54 milliseconds
+
+27 milliseconds
+
+32 milliseconds
+
+36 milliseconds
+
+17 milliseconds
+
+22 milliseconds
+
+24 milliseconds
+
+52 milliseconds
+
+55 milliseconds
+
+22 milliseconds
+
+26 milliseconds
+
+28 milliseconds
+
+30 milliseconds
+
+36 milliseconds
+
+38 milliseconds
+
+43 milliseconds
+
+46 milliseconds
+
+22 milliseconds
+
+30 milliseconds
+
+33 milliseconds
+
+18 milliseconds
+
+23 milliseconds
+
+24 milliseconds
+
+38 milliseconds
+
+40 milliseconds
+
+43 milliseconds
+
+45 milliseconds
+
+17 milliseconds
+
+28 milliseconds
+
+32 milliseconds
+
+34 milliseconds
+
+21 milliseconds
+
+21 milliseconds
+
+41 milliseconds
+
+43 milliseconds
+
+46 milliseconds
+
+53 milliseconds
+
+40 milliseconds
+
+42 milliseconds
+
+46 milliseconds
+
+49 milliseconds
+
+42 milliseconds
+
+47 milliseconds
+
+52 milliseconds
+
+30 milliseconds
+
+38 milliseconds
+
+42 milliseconds
+
+29 milliseconds
+
+32 milliseconds
+
+37 milliseconds
+
+43 milliseconds
+
+18 milliseconds
+
+20 milliseconds
+
+24 milliseconds
+
+28 milliseconds
+
+59 milliseconds
+
+64 milliseconds
+
+67 milliseconds
+
+68 milliseconds
+
+52 milliseconds
+
+54 milliseconds
+
+59 milliseconds
+
+61 milliseconds
+
+22 milliseconds
+
+29 milliseconds
+
+41 milliseconds
+
+14 milliseconds
+
+20 milliseconds
+
+20 milliseconds
+
+28 milliseconds
+
+53 milliseconds
+
+56 milliseconds
+
+31 milliseconds
+
+33 milliseconds
+
+23 milliseconds
+
+81 milliseconds
+
+18 milliseconds
+
+30 milliseconds
+
+52 milliseconds
+
+246 milliseconds
+
+248 milliseconds
+
+21 milliseconds
+
+24 milliseconds
+
+26 milliseconds
+
+25 milliseconds
+
+26 milliseconds
+
+21 milliseconds
+
+21 milliseconds
+
+24 milliseconds
+
+34 milliseconds
+
+34 milliseconds
+
+19 milliseconds
+
+22 milliseconds
+
+23 milliseconds
+
+57 milliseconds
+
+76 milliseconds
+
+88 milliseconds
+
+22 milliseconds
+
+23 milliseconds
+
+27 milliseconds
+
+28 milliseconds
+
+41 milliseconds
+
+45 milliseconds
+
+46 milliseconds
+
+19 milliseconds
+
+24 milliseconds
+
+24 milliseconds
+
+22 milliseconds
+
+22 milliseconds
+
+22 milliseconds
+
+29 milliseconds
+
+29 milliseconds
+
+15 milliseconds
+
+19 milliseconds
+
+23 milliseconds
+
+29 milliseconds
+
+24 milliseconds
+
+41 milliseconds
+
+42 milliseconds
+
+42 milliseconds
+
+17 milliseconds
+
+44 milliseconds
+
+46 milliseconds
+
+48 milliseconds
+
+29 milliseconds
+
+29 milliseconds
+
+14 milliseconds
+
+20 milliseconds
+
+21 milliseconds
+
+25 milliseconds
+
+55 milliseconds
+
+57 milliseconds
+
+13 milliseconds
+
+18 milliseconds
+
+39 milliseconds
+
+17 milliseconds
+
+19 milliseconds
+
+21 milliseconds
+
+23 milliseconds
+
+25 milliseconds
+
+53 milliseconds
+
+60 milliseconds
+
+66 milliseconds
+
+25 milliseconds
+
+156 milliseconds
+
+159 milliseconds
+
+36 milliseconds
+
+38 milliseconds
+
+15 milliseconds
+
+21 milliseconds
+
+22 milliseconds
+
+51 milliseconds
+
+59 milliseconds
+
+60 milliseconds
+
+25 milliseconds
+
+29 milliseconds
+
+34 milliseconds
+
+36 milliseconds
+
+234 milliseconds
+
+235 milliseconds
+
+238 milliseconds
+
+240 milliseconds
+
+43 milliseconds
+
+45 milliseconds
+
+34 milliseconds
+
+34 milliseconds
+
+65 milliseconds
+
+71 milliseconds
+
+73 milliseconds
+
+106 milliseconds
+
+110 milliseconds
+
+122 milliseconds
+
+39 milliseconds
+
+42 milliseconds
+
+46 milliseconds
+
+49 milliseconds
+
+41 milliseconds
+
+43 milliseconds
+
+53 milliseconds
+
+53 milliseconds
+
+29 milliseconds
+
+31 milliseconds
+
+35 milliseconds
+
+38 milliseconds
+
+73 milliseconds
+
+76 milliseconds
+
+79 milliseconds
+
+215 milliseconds
+
+17 milliseconds
+
+19 milliseconds
+
+23 milliseconds
+
+25 milliseconds
+
+18 milliseconds
+
+21 milliseconds
+
+56 milliseconds
+
+59 milliseconds
+
+87 milliseconds
+
+88 milliseconds
+
+18 milliseconds
+
+19 milliseconds
+
+23 milliseconds
+
+25 milliseconds
+
+52 milliseconds
+
+54 milliseconds
+
+58 milliseconds
+
+60 milliseconds
+
+45 milliseconds
+
+47 milliseconds
+
+32 milliseconds
+
+43 milliseconds
+
+44 milliseconds
+
+19 milliseconds
+
+21 milliseconds
+
+118 milliseconds
+
+120 milliseconds
+
+26 milliseconds
+
+41 milliseconds
+
+47 milliseconds
+
+24 milliseconds
+
+33 milliseconds
+
+38 milliseconds
+
+19 milliseconds
+
+22 milliseconds
+
+18 milliseconds
+
+27 milliseconds
+
+29 milliseconds
+
+29 milliseconds
+
+39 milliseconds
+
+67 milliseconds
+
+74 milliseconds
+
+15 milliseconds
+
+20 milliseconds
+
+23 milliseconds
+
+35 milliseconds
+
+38 milliseconds
+
+41 milliseconds
+
+42 milliseconds
+
+20 milliseconds
+
+20 milliseconds
+
+15 milliseconds
+
+17 milliseconds
+
+29 milliseconds
+
+54 milliseconds
+
+43 milliseconds
+
+61 milliseconds
+
+63 milliseconds
+
+30 milliseconds
+
+35 milliseconds
+
+40 milliseconds
+
+20 milliseconds
+
+20 milliseconds
+
+13 milliseconds
+
+59 milliseconds
+
+62 milliseconds
+
+39 milliseconds
+
+44 milliseconds
+
+46 milliseconds
+
+31 milliseconds
+
+31 milliseconds
+
+15 milliseconds
+
+21 milliseconds
+
+26 milliseconds
+
+59 milliseconds
+
+62 milliseconds
+
+45 milliseconds
+
+51 milliseconds
+
+54 milliseconds
+
+41 milliseconds
+
+48 milliseconds
+
+50 milliseconds
+
+34 milliseconds
+
+44 milliseconds
+
+25 milliseconds
+
+31 milliseconds
+
+34 milliseconds
+
+27 milliseconds
+
+29 milliseconds
+
+51 milliseconds
+
+57 milliseconds
+
+60 milliseconds
+
+363 milliseconds
+
+411 milliseconds
+
+458 milliseconds
+
+42 milliseconds
+
+43 milliseconds
+
+36 milliseconds
+
+37 milliseconds
+
+19 milliseconds
+
+37 milliseconds
+
+38 milliseconds
+
+78 milliseconds
+
+82 milliseconds
+
+83 milliseconds
+
+73 milliseconds
+
+102 milliseconds
+
+93 milliseconds
+
+94 milliseconds
+
+11 milliseconds
+
+15 milliseconds
+
+16 milliseconds
+
+32 milliseconds
+
+34 milliseconds
+
+37 milliseconds
+
+52 milliseconds
+
+18 milliseconds
+
+22 milliseconds
+
+22 milliseconds
+
