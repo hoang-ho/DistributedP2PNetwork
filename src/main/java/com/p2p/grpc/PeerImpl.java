@@ -6,7 +6,9 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,17 +23,24 @@ public class PeerImpl implements Peer{
     private int port;
     private int id;
     private Server server;
-    public int KNeighbor;
+    public String lookupRPCLatency ;
+    public String replyRPCLatency;
+    public String buyRPCLatency;
+    public String lookupResponseTime;
+
     private static final Logger logger = Logger.getLogger(PeerImpl.class.getName());
 
     public PeerImpl(int id, String IPAddress, int port, int KNeighbor) {
         this.id = id;
         this.IPAddress = IPAddress;
         this.port = port;
-        this.KNeighbor = KNeighbor;
         this.neighbors = new HashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 2)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceImpl()).executor(Executors.newFixedThreadPool(KNeighbor + 1)).build();
+        this.lookupRPCLatency = "lookupRPCLatency_" + id + ".txt";
+        this.replyRPCLatency = "replyRPCLatency_" + id + ".txt";
+        this.buyRPCLatency = "buyRPCLatency_" + id + ".txt";
+        this.lookupResponseTime = "lookupResponseTime_" + id + ".txt";
     }
 
     /**
@@ -78,7 +87,8 @@ public class PeerImpl implements Peer{
      * */
     class MarketPlaceImpl extends MarketPlaceGrpc.MarketPlaceImplBase {
         /**
-         * The No-role peer floods the request to its neighbors
+         * The lookupRPC will acks to the request immediately after it receives the request
+         * Then the lookupRPC will check if it can further flood the request
          * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
@@ -98,7 +108,8 @@ public class PeerImpl implements Peer{
         }
 
         /**
-         * This would return an ack empty message and call a helper function to traverse path the path
+         * The replyRPC will acks to the request immediately after it receives the request
+         * Then the replyRPC further continue down the reverse path
          * */
         @Override
         public void replyRPC(ReplyRequest request, StreamObserver<Empty> streamObserver) {
@@ -111,7 +122,12 @@ public class PeerImpl implements Peer{
         }
     }
 
-    public void floodLookUp(LookUpRequest request) {
+    /**
+     * Further flood the request to neighbors
+     * Flooding avoid sending back the request to the previous sender
+     * @param request the LookupRequest to further flood
+     * */
+    protected void floodLookUp(LookUpRequest request) {
         List<Integer> path = new ArrayList<>(request.getPathList());
         path.add(this.id);
         LookUpRequest newRequest =
@@ -134,8 +150,10 @@ public class PeerImpl implements Peer{
                 MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
                 logger.info("Send a lookup request to peer " + neighbor.getId() + " at port " + neighbor.getIPAddress() + " " +
                         + neighbor.getPort() + " for product " + request.getProduct());
-
+                long start = System.currentTimeMillis();
                 stub.lookupRPC(newRequest);
+                long finish = System.currentTimeMillis();
+                writeToFile((finish - start) + " milliseconds", lookupRPCLatency);
                 channel.shutdown();
             });
             lookupThread[counter].start();
@@ -151,10 +169,12 @@ public class PeerImpl implements Peer{
         }
     }
 
-    public void reverseReply(ReplyRequest request) {
+    /**
+     * reverseReply further send the request back to the buyer via the reverse path
+     * @param request the ReplyRequest to send back to buyer
+     * */
+    protected void reverseReply(ReplyRequest request) {
         List<Integer> path = new ArrayList<>(request.getPathList());
-        logger.info("PAth: " + path);
-        logger.info("All our neighbors" + getAllNeighbors());
         PeerId fromNode = neighbors.get(path.remove(path.size() - 1));
         PeerId seller = request.getSellerId();
 
@@ -164,11 +184,22 @@ public class PeerImpl implements Peer{
         logger.info("Send a reply request to peer " + fromNode.getId() + " at " + fromNode.getIPAddress() + " " + fromNode.getPort());
         ReplyRequest replyRequest =
                 ReplyRequest.newBuilder().setSellerId(seller).setProduct(request.getProduct()).addAllPath(path).build();
-        logger.info("Size of path " + replyRequest.getPathCount());
+        long start = System.currentTimeMillis();
         stub.replyRPC(replyRequest);
+        long finish = System.currentTimeMillis();
+        writeToFile((finish - start) + " milliseconds", replyRPCLatency);
         channel.shutdown();
     }
 
+    public synchronized void writeToFile(String val, String filename) {
+        try {
+            PrintWriter writer = new PrintWriter(new FileWriter(filename, true));
+            writer.println(val + "\n");
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void addNeighbor(PeerId peer) {
         this.neighbors.put(peer.getId(), peer);

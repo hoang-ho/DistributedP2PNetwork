@@ -37,12 +37,16 @@ public class Seller extends PeerImpl {
         this.stock = amount;
         this.replyPath = new ConcurrentHashMap<>();
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 2)).build();
+                ServerBuilder.forPort(port).addService(new MarketplaceSellerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 3)).build();
     }
 
 
     /**
-     * Reply request from Seller to Buyer
+     * Call a RPC reply to traverse the reverse path back to the buyer
+     * For the Seller to reply back to the Buyer
+     * Implemented in the Seller class
+     * @param buyerId the node id of the buyer
+     * @param sellerId a reference to the seller (id, IPAddress and port)
      * */
     @Override
     public void reply(int buyerId, PeerId seller) {
@@ -55,8 +59,10 @@ public class Seller extends PeerImpl {
                     + previousNode.getPort() + " for product " + product);
         ReplyRequest replyRequest =
                 ReplyRequest.newBuilder().setSellerId(seller).setProduct(this.product.name()).addAllPath(path).build();
-        logger.info("Reply path size " + replyRequest.getPathCount());
+        long start = System.currentTimeMillis();
         stub.replyRPC(replyRequest);
+        long finish = System.currentTimeMillis();
+        writeToFile((finish - start) + " milliseconds", replyRPCLatency);
         channel.shutdown();
         logger.info("Done Reply");
     }
@@ -69,8 +75,8 @@ public class Seller extends PeerImpl {
      * */
     private class MarketplaceSellerImpl extends PeerImpl.MarketPlaceImpl {
         /**
-         * This would returns an ack empty message and check if it can reply.
-         * If the Seller isn't selling the product, it call a helper function to flood the request
+         * The lookupRPC will return an ack immediately when it receives the request and check if it can reply.
+         * If the Seller isn't selling the product, it further flood the request
          * */
         @Override
         public void lookupRPC(LookUpRequest request, StreamObserver<Empty> streamObserver) {
@@ -106,9 +112,11 @@ public class Seller extends PeerImpl {
         }
 
         /**
-         * THis is a synchronized method so only one thread can access it at a time
+         * This is a synchronized method so only one thread can access it at a time
          * It first verifies again that the buy request is for the product it currently has
          * If the buy product is invalid, then it returns an error message
+         * After verification, it process the BuyRequest by decrement the count for the product sold
+         * and reply a Ack Sell message. This message is for the Buyer to increment it count for the product
          * */
         @Override
         public synchronized void buyRPC(BuyRequest buyRequest, StreamObserver<Ack> streamObserver) {

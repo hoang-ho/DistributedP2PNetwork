@@ -25,6 +25,7 @@ public class Buyer extends PeerImpl{
     private List<PeerId> potentialSellers;
     private Server server;
     private int hopCount;
+    private long startLookup;
 
     public Buyer(int id, String IPAddress, int port, int KNeighbors, Product product) {
         super(id, IPAddress, port, KNeighbors);
@@ -32,12 +33,14 @@ public class Buyer extends PeerImpl{
         this.buyItems = new ConcurrentHashMap<>();
         this.potentialSellers = Collections.synchronizedList(new ArrayList<>());
         this.server =
-                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 2)).build();
+                ServerBuilder.forPort(port).addService(new MarketPlaceBuyerImpl()).executor(Executors.newFixedThreadPool(KNeighbors + 3)).build();
     }
 
     /**
-     * Implementation lookup interface for the buyer
-     * This lookup will do a lookupRPC call to all its neighbors
+     * Call a RPC lookup to lookup for seller peer
+     * For Byuer to lookup seller to buy from
+     * @param product is a string value for the name of the product
+     * @param hopCount is an integer value for the hopCount
      * */
     @Override
     public void lookup(String product, int hopCount) {
@@ -46,7 +49,7 @@ public class Buyer extends PeerImpl{
 
         Thread[] lookupThread = new Thread[this.getNumberNeighbor()];
         int counter = 0;
-
+        startLookup = System.currentTimeMillis();
         for (PeerId neighbor: this.getAllNeighbors().values()){
             lookupThread[counter] = new Thread(() -> {
                 // Open a new channel for
@@ -56,8 +59,10 @@ public class Buyer extends PeerImpl{
                 MarketPlaceGrpc.MarketPlaceBlockingStub stub = MarketPlaceGrpc.newBlockingStub(channel).withWaitForReady();
                 logger.info("Send a lookup request to peer " + neighbor.getId() + " at port " + neighbor.getIPAddress() + " " +
                         + neighbor.getPort() + " for product " + product);
-
+                long start = System.currentTimeMillis();
                 stub.lookupRPC(request);
+                long finish = System.currentTimeMillis();
+                writeToFile((finish - start) + " milliseconds", lookupRPCLatency);
                 channel.shutdown();
             });
             lookupThread[counter].start();
@@ -74,8 +79,10 @@ public class Buyer extends PeerImpl{
     }
 
     /**
-     * Implementation for the buy
-     * @param sellerId the sellerId reference. We use this to establish a direct connection to the seller
+     * Perform a buy operation. Buyer send request directly to the Seller.
+     * Seller decrement the stock and buyer increments its inventory
+     * Implemented in the Buyer class
+     * @param peerId reference to the Seller, which is use for direct connection to the seller
      * */
     @Override
     public synchronized void buy(PeerId sellerId) {
@@ -87,7 +94,10 @@ public class Buyer extends PeerImpl{
             logger.info( "Send a buy request to peer " + sellerId.getId());
             BuyRequest request =
                     BuyRequest.newBuilder().setId(Buyer.this.getId()).setProduct(Buyer.this.product.name()).build();
+            long start = System.currentTimeMillis();
             Ack message = stub.buyRPC(request);
+            long finish = System.currentTimeMillis();
+            writeToFile((finish - start) + " milliseconds", buyRPCLatency);
             if (message.getMessage().equals("Ack Sell")) {
                 buyItems.put(product, buyItems.getOrDefault(product, 0) + 1);
                 logger.info("Bought " + this.product.name() + " from peer " + sellerId.getId() + ". Buyer current has" +
@@ -115,6 +125,7 @@ public class Buyer extends PeerImpl{
                 logger.info("Request Product: " + request.getProduct());
                 logger.info("Buyer Product " + Buyer.this.product.name());
                 if (request.getProduct().equals(Buyer.this.product.name())) {
+                    writeToFile((System.currentTimeMillis() - startLookup) + " milliseconds", lookupResponseTime);
                     logger.info("Add the seller to the list of sellers");
                     Buyer.this.potentialSellers.add(request.getSellerId());
                 }
@@ -149,7 +160,7 @@ public class Buyer extends PeerImpl{
                 this.lookup(this.product.name(), this.hopCount);
 
                 try {
-                    Thread.sleep(1000); // sleep a little bit
+                    Thread.sleep(3000); // sleep a little bit
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

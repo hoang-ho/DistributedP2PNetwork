@@ -1,4 +1,4 @@
-# Testing Proces
+# Testing Process
 
 
 ## Milestone 3
@@ -6,11 +6,12 @@
 
 ### Steps to run locally
 
-Example for config files are TestCase1.json and TestCase2.json. 
+Example for config files are TestCase1.json, TestCase2.json and TestCase3.json. 
 
 To run locally on your computer, for each test case with config file TestCase1.json/TestCase2.json/TestCase3.json, 
 open up N terminals (where N is the number of peers specified in each test case). In each terminal, decides which id, which role you want the node to take.
-For Buyer and Seller, you will also need to specify the product you want the peer to start with, for Seller, you will also need to specify stock and for Buyer, you will also need to specify HopCount
+For Buyer and Seller, you will also need to specify the product you want the peer to start with. For Seller, you will also need to specify stock, and for Buyer, you will also need to specify HopCount
+Try to start all peers at the same time!
 
 Example:
 For **TestCase1.json**, we can specify the buyer as:
@@ -78,9 +79,15 @@ java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3.json 
 
 The test script for this test case is in doc/test/TestCase3.sh, which will run 7 processes in parallel
 
+For single server deployment, I ran the test case in my laptop, which is a 4-core CPU with 16GB RAM. 
+If you run this on single server EC2, you may need at least a server with similar specs! 
+
 ### Steps to run on EC2 cluster. 
 
-1. Make sure you have key pair, here I use 677kp. Creates N EC2 instances using the following image: ami-07916b33d72291f85 
+Examples config files are TestCase2EC2.json and TestCase3EC2.json
+
+1. Make sure you have key pair, here I use 677kp. Creates N EC2 instances using the following image: ami-07916b33d72291f85, this image has all dependencies installed and code clone for you.
+If you want to use your own image, you will need to install Java 8, git and clone the repo!
 
 ```
 $ aws ec2 run-instances --image-id ami-07916b33d72291f85 --instance-type t2.micro --key-name 677kp
@@ -89,12 +96,12 @@ $ aws ec2 run-instances --image-id ami-07916b33d72291f85 --instance-type t2.micr
 2. Save the PrivateIpAddress for each peer. You can find this from the terminal output of the above command, or from sudo ifconfig when you already ssh into the EC2 instance
 
 3. Put the PrivateIpAddress of each peer as the IPAddress in the config file. Remember that if you put PrivateIpAddress of one instance as IPAddress for a peer, you later must call that peer with the same id, 
-   e.g. if you put IPAddress for peer 0 as "172.31.55.0", then later in the instance with that PrivateIpAddress, you need to specify the "-id 0"
+   e.g. if you put IPAddress for peer 0 as "172.31.55.0", then later in the instance with that PrivateIpAddress, you must specify "-id 0"
     
 4. After you replace all IPAddress, move the config file into each instance with scp
 
 ```
-$ scp -i "677kp.pem" TestCase3.json ec2-user@$PublicDnsName:~/CompSci677-Lab1
+$ scp -i "677kp.pem" TestCase3EC2.json ec2-user@$PublicDnsName:~/CompSci677-Lab1
 ```
 
 Where $PublicDnsName is the Public DNS name of your instance, obtained from running: ```aws ec2 describe-instances --instance-id $INSTANCEID```
@@ -111,7 +118,7 @@ $ ssh -i "677kp.pem" ec2-user@$PublicDnsName
 $ cd CompSci677-Lab1
 ```
 
-7. Start the test. For the instance which you use the PrivateIpAddress for peer $ID, you need to specify that ID again when running the jar file. 
+7. Start the test. For the instance which you use the PrivateIpAddress for peer $ID, you need to specify that $ID again when running the jar file. 
 For example, I use "172.31.45.247" for peer 0, later in the instance with PrivateIpAddress "172.31.45.247", I ran:
    
 ```
@@ -144,8 +151,15 @@ java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.js
 java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase3EC2.json -id 6 -role seller -product fish -stock 3 
 ```
 
-Feel free to let the peer running for 1-2 minutes to see the how process in action!
+Feel free to let the peer running for 1-2 minutes to see the process in action!
 
+Example Output for TestCase3 on EC2 cluster:
+
+In node 0 terminal:
+
+```
+
+```
 
 ### Milestone 2
 
