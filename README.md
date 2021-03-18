@@ -124,7 +124,7 @@ $ ./gradlew clean build
 View instruction in doc/testVerify.md. Customized image with Java 8, git installed and repo cloned:
 
 {
-"ImageId": "ami-07916b33d72291f85"
+"ImageId": "ami-0e02db02181e75d1c"
 }
 
 ### TODO
