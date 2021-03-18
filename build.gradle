@@ -75,21 +75,10 @@ protobuf {
     }
 }
 
-task p2pSeller(type: JavaExec) {
+task simulateRace(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
-    main = "com.p2p.grpc.Seller"
+    main = "com.p2p.SimulateRace"
 }
-
-task p2pBuyer(type: JavaExec) {
-    classpath sourceSets.main.runtimeClasspath
-    main = "com.p2p.grpc.Buyer"
-}
-
-task p2pPeer(type: JavaExec) {
-    classpath sourceSets.main.runtimeClasspath
-    main = "com.p2p.grpc.PeerImpl"
-}
-
 
 test {
     useJUnitPlatform()

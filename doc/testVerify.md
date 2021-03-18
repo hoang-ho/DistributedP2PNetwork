@@ -3,6 +3,18 @@
 
 ## Milestone 3
 
+Test cases are:
+
+![Screenshot](../TestCases.png)
+
+Test Case 1 is to verify that the network with two peers work correctly, hence the basic setup is correct for buyer and seller!
+
+Test Case 2 is for the race simulation. We create a simple network with 3 peers, 2 buyers and 1 seller.
+Once the Buyers start running, they immediately buys from Seller!. With this we can verify that Seller is able to handle concurrent buy request!
+
+Test Case 3 is to test a whole network for flooding lookup request, reverse traversal for reply request!
+
+Test Case 3 modified is to check how performance of the network changes when a node 2 and node 3 is connected!  
 
 ### Steps to run locally
 
@@ -31,16 +43,16 @@ The test script for this test case is in doc/test/TestCase1.sh, which will run 2
 For **TestCase2.json**, let node 0 and 1 be the buyer and node 2 be the seller, we can specify the buyer as:
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 0 -role buyer -product fish -hop 1
+gradle simulateRace --args="-config TestCase2.json -id 0 -role buyer -product fish -hop 1"
 ```
 
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 1 -role buyer -product fish -hop 1
+gradle simulateRace --args="-config TestCase2.json -id 1 -role buyer -product fish -hop 1"
 ```
 
 and the seller as:
 ```
-java -jar build/libs/BuyerSellerNetwork-1.0-SNAPSHOT.jar -config TestCase2.json -id 2 -role seller -product fish -stock 1
+gradle simulateRace --args="-config TestCase2.json -id 2 -role seller -product fish -stock 1"
 ```
 
 The test script for this test case is in doc/test/TestCase2.sh, which will run 3 processes in parallel
