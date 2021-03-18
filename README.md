@@ -45,7 +45,7 @@ project
 
 Test cases are:
 
-![Screenshot](../TestCases.png)
+![Screenshot](TestCases.png)
 
 Test Case 3 modified is to check how performance of the network changes when a node 2 and node 3 is connected!
 
@@ -133,7 +133,6 @@ View instruction in doc/testVerify.md. Customized image with Java 8, git install
 - [X] Test case 1: 1 buyer and 1 seller 
 - [X] Test case 2: Race condition 2 buyers 1 seller
 - [X] Test case 3: 7 peers 3 Buyers 2 Sellers 2 peers
-- [X] Simulate a race condition 
 - [X] Running test case on a single server EC2
 - [X] Deploy test case on EC2 cluster
 - [X] Measure latency
