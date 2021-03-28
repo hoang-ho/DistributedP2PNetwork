@@ -16,7 +16,7 @@ project
 │
 └───doc
 │   │   doc.md // design description
-│   │   testVerify.md // test verification
+│   │   DeployTest.md // Test and Deployment
 │   └───test
 │       │   TestCase1.sh
 │       │   TestCase2.sh
@@ -104,8 +104,6 @@ Similarly, on a distributed environment, the response time for lookup request in
 The increase in response time for node 0 and 1 is bigger than increase in response time for node 2. This is due to node 3 being a connecting node for node 0 and node 1 to the Seller, but now node 3 also have to serve node 2.
 However, the increase is much less compare to single server! This can be due the cost of new connection is distributed among involved peers on different machine, 
 while on a single server, the machine incurs the whole cost. 
-
-From the experimental results, we can conclude that when a 
 
 
 ## Build and Test
